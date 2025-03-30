@@ -2,6 +2,10 @@
   "name": "todo-app",
   "version": "1.0.0",
   "description": "",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "main": "index.js",
   "scripts": {
     "lint": "eslint . --ext .ts,.tsx",
