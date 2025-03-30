@@ -17,15 +17,16 @@ model Collection {
 }
 
 model Task {
-  id           Int      @id @default(autoincrement())
+  id           Int        @id @default(autoincrement())
   title        String
   date         DateTime?
-  completed    Boolean  @default(false)
+  completed    Boolean    @default(false)
   collection   Collection @relation(fields: [collectionId], references: [id])
   collectionId Int
   parentId     Int?
-  subtasks     Task[]   @relation("Subtasks", references: [id])
+  parent       Task?      @relation("Subtasks", fields: [parentId], references: [id])
+  subtasks     Task[]     @relation("Subtasks")
   order        Int?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 }
