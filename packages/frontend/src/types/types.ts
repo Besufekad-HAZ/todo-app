@@ -1,3 +1,11 @@
+export interface Collection {
+  id: number;
+  name: string;
+  isFavorite: boolean;
+  taskCount?: number;
+  completedCount?: number;
+}
+
 export interface Task {
   id: number;
   title: string;
@@ -6,12 +14,5 @@ export interface Task {
   collectionId: number;
   parentId?: number;
   subtasks?: Task[];
-}
-
-export interface Collection {
-  id: number;
-  name: string;
-  isFavorite: boolean;
-  taskCount?: number;
-  completedCount?: number;
+  order?: number;
 }

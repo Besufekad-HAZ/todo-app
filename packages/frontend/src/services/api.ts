@@ -40,7 +40,38 @@ export const api = createApi({
         url: `tasks/${id}/complete`,
         method: 'PATCH',
       }),
-      invalidatesTags: (result, error, arg) => [{ type: 'Task', id: result?.collectionId }],
+      invalidatesTags: (result) =>
+        result?.collectionId ? [{ type: 'Task', id: result.collectionId }] : [],
+    }),
+
+    // Update a Task
+    updateTask: builder.mutation<Task, Partial<Task>>({
+      query: (updatedTask) => {
+        if (!updatedTask.id) throw new Error('Task ID is required for update');
+        return {
+          url: `tasks/${updatedTask.id}`,
+          method: 'PUT',
+          body: updatedTask,
+        };
+      },
+      invalidatesTags: (result) =>
+        result?.collectionId ? [{ type: 'Task', id: result.collectionId }] : [],
+    }),
+
+    // Delete a Task
+    deleteTask: builder.mutation<Task | { message: string }, number>({
+      query: (id) => ({
+        url: `tasks/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (result, error, arg) => {
+        // If the server returns the deleted task with a collectionId, re-invalidate that collection’s tasks:
+        if ((result as Task)?.collectionId) {
+          return [{ type: 'Task', id: (result as Task).collectionId }];
+        }
+        // Otherwise just do a generic invalidation
+        return [];
+      },
     }),
   }),
 });
@@ -51,4 +82,6 @@ export const {
   useGetTasksByCollectionQuery,
   useCreateTaskMutation,
   useCompleteTaskMutation,
+  useUpdateTaskMutation,
+  useDeleteTaskMutation,
 } = api;
