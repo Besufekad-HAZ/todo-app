@@ -10,19 +10,26 @@ export function CollectionList({ onSelect }: { onSelect: (id: number) => void })
       {collections?.map((collection) => (
         <div
           key={collection.id}
-          className="p-4 border-b hover:bg-gray-50 cursor-pointer flex justify-between"
+          className="p-4 border-b hover:bg-gray-50 cursor-pointer"
           onClick={() => onSelect(collection.id)}
         >
-          <span>{collection.name}</span>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleFavorite(collection.id);
-            }}
-            className={collection.isFavorite ? 'text-yellow-400' : 'text-gray-300'}
-          >
-            ★
-          </button>
+          <div className="flex justify-between items-center">
+            <span className="font-medium">{collection.name}</span>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleFavorite(collection.id);
+              }}
+              className={collection.isFavorite ? 'text-yellow-400' : 'text-gray-300'}
+            >
+              ★
+            </button>
+          </div>
+          {typeof collection.taskCount === 'number' && (
+            <div className="text-xs text-gray-500 mt-1">
+              {collection.completedCount || 0} of {collection.taskCount} tasks completed
+            </div>
+          )}
         </div>
       ))}
     </div>
