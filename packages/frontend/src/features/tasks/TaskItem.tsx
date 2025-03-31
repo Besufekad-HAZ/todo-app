@@ -6,6 +6,21 @@ export function TaskItem({ task, depth = 0 }: { task: Task; depth?: number }) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isEditing, setIsEditing] = useState(false);
   const [completeTask] = useCompleteTaskMutation();
+  const [pressTimer, setPressTimer] = useState<NodeJS.Timeout | null>(null);
+
+  const handleTouchStart = () => {
+    const timer = setTimeout(() => {
+      // Show delete confirmation
+    }, 1000);
+    setPressTimer(timer);
+  };
+
+  const handleTouchEnd = () => {
+    if (pressTimer) {
+      clearTimeout(pressTimer);
+      setPressTimer(null);
+    }
+  };
 
   const handleDoubleClick = () => setIsEditing(true);
   const handleComplete = () => completeTask(task.id);

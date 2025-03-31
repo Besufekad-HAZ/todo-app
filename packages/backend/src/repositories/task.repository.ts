@@ -8,22 +8,43 @@ export const createTask = async (taskData: {
   date?: Date;
   parentId?: number;
 }): Promise<Task> => {
-  return prisma.task.create({
-    data: {
-      title: taskData.title,
-      collectionId: taskData.collectionId,
-      date: taskData.date,
-      parentId: taskData.parentId,
-    },
-  });
+  return prisma.task.create({ data: taskData });
+};
+
+export const completeTaskWithSubtasks = async (taskId: number): Promise<void> => {
+  await prisma.$transaction([
+    prisma.task.update({
+      where: { id: taskId },
+      data: { completed: true },
+    }),
+    prisma.task.updateMany({
+      where: { parentId: taskId },
+      data: { completed: true },
+    }),
+  ]);
 };
 
 export const getTasksByCollection = async (collectionId: number): Promise<Task[]> => {
   return prisma.task.findMany({
     where: { collectionId, parentId: null },
-    include: { subtasks: true },
+    include: { subtasks: true }, // Assuming you have a self-relation for subtasks
     orderBy: [{ order: 'asc' }, { createdAt: 'asc' }],
   });
 };
 
-// I'll Add more CRUD operations as needed
+// Add these for update, delete, and toggle
+export const updateTask = async (id: number, updates: Partial<Task>): Promise<Task> => {
+  return prisma.task.update({ where: { id }, data: updates });
+};
+
+export const deleteTask = async (id: number): Promise<Task> => {
+  return prisma.task.delete({ where: { id } });
+};
+
+export const toggleTask = async (id: number): Promise<Task> => {
+  const task = await prisma.task.findUnique({ where: { id } });
+  return prisma.task.update({
+    where: { id },
+    data: { completed: !task?.completed },
+  });
+};
