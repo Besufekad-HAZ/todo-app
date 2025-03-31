@@ -1,1 +1,9 @@
 @import "tailwindcss";
+
+
+
+@layer utilities {
+  .transition-slow {
+    transition-duration: 300ms;
+  }
+}
