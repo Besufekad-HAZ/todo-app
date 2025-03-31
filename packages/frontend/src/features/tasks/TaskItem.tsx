@@ -63,7 +63,7 @@ export function TaskItem({
 
   return (
     <div
-      className={`${paddingClass} py-2 border-b border-gray-200`}
+      className={`group py-3 px-4 hover:bg-surface-100 dark:hover:bg-gray-700 transition-colors ${depth > 0 ? 'border-l-2 border-primary-200 dark:border-primary-800' : ''}`}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       onMouseDown={handleTouchStart}
