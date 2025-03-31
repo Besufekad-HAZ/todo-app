@@ -1,12 +1,10 @@
-// src/components/layout/Header.tsx
 import { useState } from 'react';
-import { MenuIcon, XIcon } from '@heroicons/react/outline';
+import { Menu, X } from 'lucide-react'; // Lucide icons
 
 interface HeaderProps {
   onMenuToggle: () => void;
   rightContent?: React.ReactNode;
 }
-
 
 export function Header({ onMenuToggle, rightContent }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -26,13 +24,10 @@ export function Header({ onMenuToggle, rightContent }: HeaderProps) {
               }}
               aria-label="Toggle menu"
             >
-              {mobileMenuOpen ? (
-                <XIcon className="block h-6 w-6" />
-              ) : (
-                <MenuIcon className="block h-6 w-6" />
-              )}
+              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
             <div className="flex-shrink-0 flex items-center ml-4 md:ml-0">
+              {/* Your logo */}
               <svg
                 className="h-8 w-8 text-primary-500"
                 fill="none"

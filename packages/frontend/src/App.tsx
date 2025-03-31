@@ -90,3 +90,5 @@ const EmptyState = () => (
     </p>
   </div>
 );
+
+export default App;
