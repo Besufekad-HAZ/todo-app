@@ -1,6 +1,6 @@
 import { useGetTasksByCollectionQuery } from '../../services/api';
 import { TaskItem } from './TaskItem';
-import { Skeleton } from '../../components/ui/Skeleton';
+import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
 
 export function TaskList({ collectionId }: { collectionId: number }) {
   const { data: tasks, isLoading, error, refetch } = useGetTasksByCollectionQuery(collectionId);
@@ -8,9 +8,7 @@ export function TaskList({ collectionId }: { collectionId: number }) {
   if (isLoading)
     return (
       <div className="flex-1 overflow-auto p-4 space-y-2">
-        <Skeleton className="h-12 w-full" />
-        <Skeleton className="h-12 w-full" />
-        <Skeleton className="h-12 w-full" />
+        <LoadingSpinner />
       </div>
     );
 
