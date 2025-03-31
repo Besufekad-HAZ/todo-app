@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import type { Collection, Task } from '../types';
+import type { Collection, Task } from '../types/task';
 
 export const api = createApi({
   reducerPath: 'api',
@@ -30,9 +30,18 @@ export const api = createApi({
         method: 'POST',
         body: task,
       }),
-      invalidatesTags: (result, error, arg) => [{ type: 'Task', id: arg.collectionId }],
+      invalidatesTags: (result, error, arg) =>
+        arg.collectionId ? [{ type: 'Task', id: arg.collectionId }] : [],
     }),
-    // Add more endpoints for update/delete/toggle
+
+    // Complete a Task
+    completeTask: builder.mutation<Task, number>({
+      query: (id) => ({
+        url: `tasks/${id}/complete`,
+        method: 'PATCH',
+      }),
+      invalidatesTags: (result, error, arg) => [{ type: 'Task', id: result?.collectionId }],
+    }),
   }),
 });
 
@@ -41,4 +50,5 @@ export const {
   useToggleFavoriteMutation,
   useGetTasksByCollectionQuery,
   useCreateTaskMutation,
+  useCompleteTaskMutation,
 } = api;
