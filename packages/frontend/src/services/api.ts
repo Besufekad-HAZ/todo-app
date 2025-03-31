@@ -3,7 +3,7 @@ import type { Collection, Task } from '../types/types';
 
 export const api = createApi({
   reducerPath: 'api',
-  baseQuery: fetchBaseQuery({ baseUrl: '/api' }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:5000/api' }),
   tagTypes: ['Collection', 'Task'],
   endpoints: (builder) => ({
     // Collections
