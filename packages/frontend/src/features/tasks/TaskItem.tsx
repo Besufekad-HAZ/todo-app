@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Task } from '../../types/task';
+import { Task } from '../../types/types';
 import { useCompleteTaskMutation } from '../../services/api';
 
 export function TaskItem({ task, depth = 0 }: { task: Task; depth?: number }) {

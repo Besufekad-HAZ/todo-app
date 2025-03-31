@@ -7,3 +7,11 @@ export interface Task {
   parentId?: number;
   subtasks?: Task[];
 }
+
+export interface Collection {
+  id: number;
+  name: string;
+  isFavorite: boolean;
+  taskCount?: number;
+  completedCount?: number;
+}
