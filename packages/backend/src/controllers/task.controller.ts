@@ -46,6 +46,16 @@ export const createTask: RequestHandler<
   }
 };
 
+export const completeTask = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    await TaskRepository.completeTaskWithSubtasks(Number(id));
+    res.json({ message: 'Task and subtasks marked as completed' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to complete task' });
+  }
+};
+
 // updateTask
 export const updateTask = async (req: Request, res: Response) => {
   // Implement the update logic

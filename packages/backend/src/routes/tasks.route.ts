@@ -8,5 +8,6 @@ router.post('/', TaskController.createTask);
 router.put('/:id', TaskController.updateTask);
 router.delete('/:id', TaskController.deleteTask);
 router.patch('/:id/toggle', TaskController.toggleTask);
+router.patch('/:id/complete', TaskController.completeTask);
 
 export default router;
