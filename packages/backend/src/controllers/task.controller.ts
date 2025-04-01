@@ -94,7 +94,6 @@ export const toggleTask = async (req: Request, res: Response) => {
   }
 };
 
-
 // Complete Task with Subtasks
 export const completeTaskWithSubtasks = async (req: Request, res: Response) => {
   const { id } = req.params;

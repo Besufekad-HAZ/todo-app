@@ -1,4 +1,5 @@
 export interface Collection {
+  title: ReactNode;
   id: number;
   name: string;
   isFavorite: boolean;

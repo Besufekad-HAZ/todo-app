@@ -53,10 +53,17 @@ export function TaskItem({
     }
   };
 
+  // In TaskItem component
   const handleDelete = async () => {
-    await deleteTask(task.id);
-    setShowDeleteConfirm(false);
-    onTaskUpdated?.();
+    try {
+      await deleteTask(task.id).unwrap();
+      toast.success('Task deleted successfully');
+      onTaskUpdated?.();
+    } catch (error) {
+      toast.error('Failed to delete task');
+    } finally {
+      setShowDeleteConfirm(false);
+    }
   };
 
   const handleEditSubmit = async (e: React.FormEvent) => {
