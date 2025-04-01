@@ -1,43 +1,49 @@
 @import "tailwindcss";
 
+/* Import Tailwind’s layers using the recommended directives */
+/* @tailwind base;
+@tailwind components;
+@tailwind utilities; */
 
-
-/* @layer utilities {
-  .transition-slow {
-    transition-duration: 300ms;
-  }
-} */
-
+/* Base styles & custom properties */
 @layer base {
   :root {
     --color-text-base: #1e293b;
     --color-text-muted: #64748b;
     --color-bg-surface: #ffffff;
   }
-
   .dark {
     --color-text-base: #f8fafc;
     --color-text-muted: #94a3b8;
     --color-bg-surface: #0f172a;
   }
-
   body {
-    @apply text-text-base bg-bg-surface transition-colors duration-200;
+    /* Use custom properties directly instead of relying on a custom utility */
+    color: var(--color-text-base);
+    background-color: var(--color-bg-surface);
+    @apply transition-colors duration-200;
     font-feature-settings: 'rlig' 1, 'calt' 1;
   }
 }
 
+/* If you need additional custom utilities, define them here */
+@layer utilities {
+  .transition-slow {
+    transition-duration: 300ms;
+  }
+}
+
+/* Components */
 @layer components {
   .btn-primary {
     @apply px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600
-           transition-colors shadow-sm focus:outline-none focus:ring-2
-           focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50;
+      transition-colors shadow-sm focus:outline-none focus:ring-2
+      focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50;
   }
-
   .input-field {
     @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none
-           focus:ring-2 focus:ring-blue-500 focus:border-transparent
-           dark:border-gray-600 dark:bg-gray-700 dark:text-white;
+      focus:ring-2 focus:ring-blue-500 focus:border-transparent
+      dark:border-gray-600 dark:bg-gray-700 dark:text-white;
   }
 }
 
@@ -46,7 +52,6 @@
   from { opacity: 0; }
   to { opacity: 1; }
 }
-
 .animate-fade-in {
   animation: fadeIn 150ms ease-in;
 }

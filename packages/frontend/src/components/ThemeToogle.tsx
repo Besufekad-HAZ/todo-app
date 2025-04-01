@@ -1,14 +1,22 @@
+// src/components/ThemeToggle.tsx
 import { useEffect, useState } from 'react';
+import { SunIcon, MoonIcon } from '@heroicons/react/24/outline';
 
 export function ThemeToggle() {
   const [darkMode, setDarkMode] = useState(() => {
-    return (
-      localStorage.getItem('theme') === 'dark' ||
-      (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)
-    );
+    // Check localStorage first, then fall back to system preference
+    if (typeof window !== 'undefined') {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme) {
+        return savedTheme === 'dark';
+      }
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return false;
   });
 
   useEffect(() => {
+    // Apply the theme class to the root element
     if (darkMode) {
       document.documentElement.classList.add('dark');
       localStorage.setItem('theme', 'dark');
@@ -21,17 +29,13 @@ export function ThemeToggle() {
   return (
     <button
       onClick={() => setDarkMode(!darkMode)}
-      className="p-2 rounded-full hover:bg-surface-100 dark:hover:bg-gray-700"
-      aria-label="Toggle dark mode"
+      className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+      aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
     >
       {darkMode ? (
-        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0z" />
-        </svg>
+        <SunIcon className="w-5 h-5 text-yellow-400" />
       ) : (
-        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
-        </svg>
+        <MoonIcon className="w-5 h-5 text-gray-600 dark:text-gray-300" />
       )}
     </button>
   );
