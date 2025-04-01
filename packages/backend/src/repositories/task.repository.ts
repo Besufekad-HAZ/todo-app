@@ -34,17 +34,27 @@ export const getTasksByCollection = async (collectionId: number): Promise<Task[]
 
 // Add these for update, delete, and toggle
 export const updateTask = async (id: number, updates: Partial<Task>): Promise<Task> => {
-  return prisma.task.update({ where: { id }, data: updates });
-};
-
-export const deleteTask = async (id: number): Promise<Task> => {
-  return prisma.task.delete({ where: { id } });
-};
-
-export const toggleTask = async (id: number): Promise<Task> => {
-  const task = await prisma.task.findUnique({ where: { id } });
   return prisma.task.update({
     where: { id },
-    data: { completed: !task?.completed },
+    data: updates,
+  });
+};
+
+// Delete a Task and its subtasks
+export const deleteTaskWithSubtasks = async (id: number): Promise<void> => {
+  // Delete subtasks first, then delete the parent
+  await prisma.$transaction([
+    prisma.task.deleteMany({ where: { parentId: id } }),
+    prisma.task.delete({ where: { id } }),
+  ]);
+};
+
+// Toggle a Task's completion
+export const toggleTask = async (id: number): Promise<Task> => {
+  const task = await prisma.task.findUnique({ where: { id } });
+  if (!task) throw new Error('Task not found');
+  return prisma.task.update({
+    where: { id },
+    data: { completed: !task.completed },
   });
 };
