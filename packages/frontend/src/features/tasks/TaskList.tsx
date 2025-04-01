@@ -3,6 +3,7 @@ import { useGetTasksByCollectionQuery } from '../../services/api';
 import { TaskItem } from './TaskItem';
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
 import { EmptyState } from '../../components/ui/EmptyState';
+import { Task } from '../../types/types';
 
 export function TaskList({ collectionId }: { collectionId: number }) {
   const { data: tasks, isLoading, error, refetch } = useGetTasksByCollectionQuery(collectionId);
