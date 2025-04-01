@@ -1,3 +1,4 @@
+// src/App.tsx
 import { useState } from 'react';
 import { CollectionList } from './features/collections/CollectionList';
 import { TaskList } from './features/tasks/TaskList';
@@ -6,6 +7,7 @@ import { Toaster } from './components/ui/Toaster';
 import { Header } from './components/layout/Header';
 import { ThemeToggle } from './components/ThemeToogle';
 import { MobileSidebar } from './components/layout/MobileSidebar';
+import { EmptyState } from './components/ui/EmptyState';
 
 export function App() {
   const [selectedCollection, setSelectedCollection] = useState<number | null>(null);
@@ -13,7 +15,7 @@ export function App() {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-surface-50 dark:bg-gray-900 flex flex-col transition-colors">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col transition-colors duration-200">
       <Header
         onMenuToggle={() => setMobileSidebarOpen(!mobileSidebarOpen)}
         rightContent={<ThemeToggle />}
@@ -45,15 +47,22 @@ export function App() {
           {selectedCollection ? (
             <>
               <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                <h2 className="text-xl font-semibold">Tasks</h2>
-                <button onClick={() => setShowTaskForm(true)} className="btn-primary">
+                <h2 className="text-xl font-semibold text-gray-800 dark:text-white">Tasks</h2>
+                <button
+                  onClick={() => setShowTaskForm(true)}
+                  className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md shadow-sm transition-colors"
+                >
                   Add Task
                 </button>
               </div>
               <TaskList collectionId={selectedCollection} />
             </>
           ) : (
-            <EmptyState onAddCollection={() => {}} />
+            <EmptyState
+              icon="collection"
+              title="No collection selected"
+              description="Select a collection from the sidebar to view tasks"
+            />
           )}
         </main>
       </div>
@@ -66,29 +75,5 @@ export function App() {
     </div>
   );
 }
-
-const EmptyState = () => (
-  <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-    <div className="w-24 h-24 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center mb-4">
-      <svg
-        className="w-12 h-12 text-primary-500"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="1.5"
-          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-        />
-      </svg>
-    </div>
-    <h3 className="text-lg font-medium text-gray-900 dark:text-white">No collection selected</h3>
-    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-      Select a collection from the sidebar to view tasks
-    </p>
-  </div>
-);
 
 export default App;
