@@ -62,8 +62,8 @@ export function TaskItem({
 
   return (
     <div
-      className={`group relative py-3 px-4 hover:bg-surface-100 dark:hover:bg-gray-700/50 transition-colors duration-200 ${
-        depth > 0 ? 'border-l-2 border-primary-200 dark:border-primary-800 ml-3' : ''
+      className={`group relative py-3 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 ${
+        depth > 0 ? 'border-l-2 border-gray-200 dark:border-gray-600 ml-3' : ''
       }`}
       style={{ paddingLeft: `${depth * 12}px` }}
       onTouchStart={handleTouchStart}
@@ -80,7 +80,7 @@ export function TaskItem({
             value={editTitle}
             onChange={(e) => setEditTitle(e.target.value)}
             autoFocus
-            className="flex-1 input-field py-1.5 px-3 text-sm"
+            className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white text-sm"
             onBlur={() => setIsEditing(false)}
           />
           <div className="flex gap-1">

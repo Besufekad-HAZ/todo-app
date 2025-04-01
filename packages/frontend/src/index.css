@@ -8,19 +8,20 @@
 /* Base styles & custom properties */
 @layer base {
   :root {
-    --color-text-base: #1e293b;
-    --color-text-muted: #64748b;
-    --color-bg-surface: #ffffff;
+    --color-text: 23 23 23; /* neutral-800 */
+    --color-text-muted: 82 82 82; /* neutral-600 */
+    --color-bg: 255 255 255; /* white */
   }
+
   .dark {
-    --color-text-base: #f8fafc;
-    --color-text-muted: #94a3b8;
-    --color-bg-surface: #0f172a;
+    --color-text: 245 245 245; /* neutral-100 */
+    --color-text-muted: 163 163 163; /* neutral-400 */
+    --color-bg: 23 23 23; /* neutral-900 */
   }
+
   body {
-    /* Use custom properties directly instead of relying on a custom utility */
-    color: var(--color-text-base);
-    background-color: var(--color-bg-surface);
+    color: rgb(var(--color-text));
+    background-color: rgb(var(--color-bg));
     @apply transition-colors duration-200;
     font-feature-settings: 'rlig' 1, 'calt' 1;
   }

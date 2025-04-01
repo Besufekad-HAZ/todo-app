@@ -17,7 +17,7 @@ export function Header({ onMenuToggle, rightContent }: HeaderProps) {
           <div className="flex items-center">
             <button
               type="button"
-              className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none"
+              className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
               onClick={() => {
                 onMenuToggle();
                 setMobileMenuOpen(!mobileMenuOpen);

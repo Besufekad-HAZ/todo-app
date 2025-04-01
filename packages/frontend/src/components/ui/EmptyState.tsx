@@ -40,7 +40,7 @@ export function EmptyState({
   };
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+    <div className="flex-1 flex flex-col items-center justify-center p-6 text-center  dark:text-white">
       <div className="w-24 h-24 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center mb-4">
         {getIcon()}
       </div>
