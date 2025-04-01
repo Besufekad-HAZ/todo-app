@@ -56,18 +56,42 @@ export const completeTask = async (req: Request, res: Response) => {
   }
 };
 
-// updateTask
+// Update Task
 export const updateTask = async (req: Request, res: Response) => {
-  // Implement the update logic
-  res.status(501).json({ error: 'Not implemented' });
+  const { id } = req.params;
+  const { title, date, completed, parentId, order } = req.body;
+  try {
+    const updatedTask = await TaskRepository.updateTask(Number(id), {
+      title,
+      date: date ? new Date(date) : undefined,
+      completed,
+      parentId,
+      order,
+    });
+    res.json(updatedTask);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update task' });
+  }
 };
 
+// Delete Task (and its subtasks)
 export const deleteTask = async (req: Request, res: Response) => {
-  // Implement the delete logic
-  res.status(501).json({ error: 'Not implemented' });
+  const { id } = req.params;
+  try {
+    await TaskRepository.deleteTaskWithSubtasks(Number(id));
+    res.json({ message: 'Task and subtasks deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete task' });
+  }
 };
 
+// Toggle Task
 export const toggleTask = async (req: Request, res: Response) => {
-  // Implement the toggle logic
-  res.status(501).json({ error: 'Not implemented' });
+  const { id } = req.params;
+  try {
+    const toggledTask = await TaskRepository.toggleTask(Number(id));
+    res.json(toggledTask);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to toggle task' });
+  }
 };
