@@ -32,3 +32,19 @@
       dark:border-gray-600 dark:bg-gray-700 dark:text-white;
   }
 }
+
+@layer utilities {
+  .drag-handle {
+    touch-action: none;
+  }
+
+  .dragging {
+    opacity: 0.5;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .sortable-ghost {
+    background-color: rgba(59, 130, 246, 0.1);
+    border-radius: 0.375rem;
+  }
+}

@@ -1,3 +1,7 @@
+// src/types/dnd.ts
+import type { DraggableSyntheticListeners } from '@dnd-kit/core';
+import { ReactNode } from 'react';
+
 export interface Collection {
   title: ReactNode;
   id: number;
@@ -19,3 +23,15 @@ export interface Task {
   order?: number;
   isExpanded?: boolean; // For UI toggling
 }
+
+export type DragHandleProps = {
+  attributes: {
+    role: string;
+    tabIndex: number;
+    'aria-describedby': string;
+    'aria-pressed': boolean | undefined;
+    'aria-roledescription': string;
+    'aria-label': string;
+  };
+  listeners: DraggableSyntheticListeners | undefined;
+};

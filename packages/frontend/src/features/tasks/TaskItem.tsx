@@ -8,15 +8,18 @@ import {
 } from '../../services/api';
 import { CheckCircleIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { toast } from 'react-toastify';
-
+import { GripVertical } from 'lucide-react';
+import { SortableSubtasksList } from './SortableSubtaskList';
 export function TaskItem({
   task,
   depth = 0,
   onTaskUpdated,
+  dragHandleProps,
 }: {
   task: Task;
   depth?: number;
   onTaskUpdated?: () => void;
+  dragHandleProps?: any;
 }) {
   const [isExpanded, setIsExpanded] = useState(task.isExpanded ?? true);
   const [isEditing, setIsEditing] = useState(false);
@@ -133,16 +136,14 @@ export function TaskItem({
         </form>
       ) : (
         /* View Mode */
-        <div className="flex items-start gap-3">
-          {/* Toggle subtask visibility icon */}
-          {hasSubtasks && (
-            <button
-              onClick={toggleExpand}
-              className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 mt-0.5"
-            >
-              {isExpanded ? '▼' : '▶'}
-            </button>
-          )}
+        <div className="flex items-start gap-2">
+          {/* Drag handle */}
+          <button
+            {...dragHandleProps}
+            className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 cursor-grab active:cursor-grabbing"
+          >
+            <GripVertical className="h-4 w-4" />
+          </button>
           <button
             onClick={handleComplete}
             className={`mt-0.5 flex-shrink-0 h-5 w-5 rounded-full border flex items-center justify-center transition-colors ${
@@ -199,7 +200,6 @@ export function TaskItem({
           </div>
         </div>
       )}
-
       {/* Delete Confirmation Dialog */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
@@ -225,19 +225,13 @@ export function TaskItem({
           </div>
         </div>
       )}
-
       {/* Subtasks */}
       {isExpanded && hasSubtasks && (
-        <div className="mt-1 space-y-1">
-          {task.subtasks?.map((subtask) => (
-            <TaskItem
-              key={subtask.id}
-              task={subtask}
-              depth={depth + 1}
-              onTaskUpdated={onTaskUpdated}
-            />
-          ))}
-        </div>
+        <SortableSubtasksList
+          subtasks={task.subtasks || []}
+          depth={depth + 1}
+          onTaskUpdated={onTaskUpdated}
+        />
       )}
     </div>
   );
