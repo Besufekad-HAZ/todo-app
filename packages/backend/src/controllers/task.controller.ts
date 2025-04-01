@@ -5,11 +5,7 @@ export const getTasksByCollection = async (req: Request, res: Response) => {
   const { collectionId } = req.params;
   try {
     const tasks = await TaskRepository.getTasksByCollection(Number(collectionId));
-    if (!tasks || tasks.length === 0) {
-      res.status(404).json({ message: 'No tasks available for this collection' });
-      return;
-    }
-    res.json(tasks);
+    res.json(tasks || []); // Always return an array, even if empty
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch tasks' });
   }
