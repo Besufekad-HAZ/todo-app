@@ -42,10 +42,12 @@ export const createTask: RequestHandler<
   }
 };
 
+
 export const completeTask = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    await TaskRepository.completeTaskWithSubtasks(Number(id));
+    // Pass "true" as the second argument
+    await TaskRepository.completeTaskWithSubtasks(Number(id), true);
     res.json({ message: 'Task and subtasks marked as completed' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to complete task' });
@@ -89,5 +91,18 @@ export const toggleTask = async (req: Request, res: Response) => {
     res.json(toggledTask);
   } catch (error) {
     res.status(500).json({ error: 'Failed to toggle task' });
+  }
+};
+
+
+// Complete Task with Subtasks
+export const completeTaskWithSubtasks = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { complete } = req.body;
+  try {
+    await TaskRepository.completeTaskWithSubtasks(Number(id), !!complete);
+    res.json({ message: 'Task and subtasks updated successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update task and subtasks' });
   }
 };

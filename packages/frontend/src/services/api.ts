@@ -1,3 +1,4 @@
+//// filepath: /home/bese/All projects/todo-app/packages/frontend/src/services/api.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { Collection, Task } from '../types/types';
 
@@ -33,8 +34,6 @@ export const api = createApi({
       invalidatesTags: (result, error, arg) =>
         arg.collectionId ? [{ type: 'Task', id: arg.collectionId }] : [],
     }),
-
-    // Complete a Task
     completeTask: builder.mutation<Task, number>({
       query: (id) => ({
         url: `tasks/${id}/complete`,
@@ -43,8 +42,6 @@ export const api = createApi({
       invalidatesTags: (result) =>
         result?.collectionId ? [{ type: 'Task', id: result.collectionId }] : [],
     }),
-
-    // Update a Task
     updateTask: builder.mutation<Task, Partial<Task>>({
       query: (updatedTask) => {
         if (!updatedTask.id) throw new Error('Task ID is required for update');
@@ -57,21 +54,28 @@ export const api = createApi({
       invalidatesTags: (result) =>
         result?.collectionId ? [{ type: 'Task', id: result.collectionId }] : [],
     }),
-
-    // Delete a Task
     deleteTask: builder.mutation<Task | { message: string }, number>({
       query: (id) => ({
         url: `tasks/${id}`,
         method: 'DELETE',
       }),
       invalidatesTags: (result, error, arg) => {
-        // If the server returns the deleted task with a collectionId, re-invalidate that collection’s tasks:
         if ((result as Task)?.collectionId) {
           return [{ type: 'Task', id: (result as Task).collectionId }];
         }
-        // Otherwise just do a generic invalidation
         return [];
       },
+    }),
+
+    // New endpoint: complete task + subtasks
+    completeTaskWithSubtasks: builder.mutation<Task, { id: number; complete: boolean }>({
+      query: ({ id, complete }) => ({
+        url: `tasks/${id}/complete-with-subtasks`,
+        method: 'PATCH',
+        body: { complete },
+      }),
+      invalidatesTags: (result) =>
+        result?.collectionId ? [{ type: 'Task', id: result.collectionId }] : [],
     }),
   }),
 });
@@ -84,4 +88,5 @@ export const {
   useCompleteTaskMutation,
   useUpdateTaskMutation,
   useDeleteTaskMutation,
+  useCompleteTaskWithSubtasksMutation,
 } = api;

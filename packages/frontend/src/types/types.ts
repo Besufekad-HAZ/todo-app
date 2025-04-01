@@ -6,6 +6,7 @@ export interface Collection {
   completedCount?: number;
 }
 
+// src/types/types.ts
 export interface Task {
   id: number;
   title: string;
@@ -15,4 +16,5 @@ export interface Task {
   parentId?: number;
   subtasks?: Task[];
   order?: number;
+  isExpanded?: boolean; // For UI toggling
 }

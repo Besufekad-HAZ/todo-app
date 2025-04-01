@@ -1,11 +1,13 @@
+//// filepath: /home/bese/All projects/todo-app/packages/frontend/src/features/tasks/TaskItem.tsx
 import { useState, useCallback } from 'react';
 import { Task } from '../../types/types';
 import {
-  useCompleteTaskMutation,
+  useCompleteTaskWithSubtasksMutation,
   useDeleteTaskMutation,
   useUpdateTaskMutation,
 } from '../../services/api';
 import { CheckCircleIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { toast } from 'react-toastify';
 
 export function TaskItem({
   task,
@@ -16,12 +18,14 @@ export function TaskItem({
   depth?: number;
   onTaskUpdated?: () => void;
 }) {
+  const [isExpanded, setIsExpanded] = useState(task.isExpanded ?? true);
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(task.title);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [pressTimer, setPressTimer] = useState<NodeJS.Timeout | null>(null);
 
-  const [completeTask] = useCompleteTaskMutation();
+  // Use the new mutation for completing task + subtasks:
+  const [completeTaskWithSubtasks] = useCompleteTaskWithSubtasksMutation();
   const [deleteTask] = useDeleteTaskMutation();
   const [updateTask] = useUpdateTaskMutation();
 
@@ -29,7 +33,7 @@ export function TaskItem({
   const handleTouchStart = useCallback(() => {
     const timer = setTimeout(() => {
       setShowDeleteConfirm(true);
-    }, 800); // Reduced from 1000ms for better UX
+    }, 800);
     setPressTimer(timer);
   }, []);
 
@@ -41,8 +45,12 @@ export function TaskItem({
   }, [pressTimer]);
 
   const handleComplete = async () => {
-    await completeTask(task.id);
-    onTaskUpdated?.();
+    try {
+      await completeTaskWithSubtasks({ id: task.id, complete: !task.completed }).unwrap();
+      onTaskUpdated?.();
+    } catch (error) {
+      toast.error('Failed to update task');
+    }
   };
 
   const handleDelete = async () => {
@@ -59,6 +67,10 @@ export function TaskItem({
       onTaskUpdated?.();
     }
   };
+
+  // Toggle subtask visibility
+  const hasSubtasks = task.subtasks && task.subtasks.length > 0;
+  const toggleExpand = () => setIsExpanded(!isExpanded);
 
   return (
     <div
@@ -115,6 +127,15 @@ export function TaskItem({
       ) : (
         /* View Mode */
         <div className="flex items-start gap-3">
+          {/* Toggle subtask visibility icon */}
+          {hasSubtasks && (
+            <button
+              onClick={toggleExpand}
+              className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 mt-0.5"
+            >
+              {isExpanded ? '▼' : '▶'}
+            </button>
+          )}
           <button
             onClick={handleComplete}
             className={`mt-0.5 flex-shrink-0 h-5 w-5 rounded-full border flex items-center justify-center transition-colors ${
@@ -122,7 +143,6 @@ export function TaskItem({
                 ? 'bg-primary-500 border-primary-500 text-white'
                 : 'border-gray-300 dark:border-gray-500 hover:border-primary-300'
             }`}
-            aria-label={task.completed ? 'Mark incomplete' : 'Mark complete'}
           >
             {task.completed && (
               <svg className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
@@ -152,7 +172,7 @@ export function TaskItem({
               )}
             </div>
 
-            {/* Action buttons (visible on hover) */}
+            {/* Edit/Delete buttons on hover */}
             <div className="absolute right-3 top-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
               <button
                 onClick={() => setIsEditing(true)}
@@ -200,9 +220,18 @@ export function TaskItem({
       )}
 
       {/* Subtasks */}
-      {task.subtasks?.map((subtask) => (
-        <TaskItem key={subtask.id} task={subtask} depth={depth + 1} onTaskUpdated={onTaskUpdated} />
-      ))}
+      {isExpanded && hasSubtasks && (
+        <div className="mt-1 space-y-1">
+          {task.subtasks?.map((subtask) => (
+            <TaskItem
+              key={subtask.id}
+              task={subtask}
+              depth={depth + 1}
+              onTaskUpdated={onTaskUpdated}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

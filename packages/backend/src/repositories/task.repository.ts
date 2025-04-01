@@ -11,15 +11,15 @@ export const createTask = async (taskData: {
   return prisma.task.create({ data: taskData });
 };
 
-export const completeTaskWithSubtasks = async (taskId: number): Promise<void> => {
+export const completeTaskWithSubtasks = async (taskId: number, complete: boolean) => {
   await prisma.$transaction([
     prisma.task.update({
       where: { id: taskId },
-      data: { completed: true },
+      data: { completed: complete },
     }),
     prisma.task.updateMany({
       where: { parentId: taskId },
-      data: { completed: true },
+      data: { completed: complete },
     }),
   ]);
 };
