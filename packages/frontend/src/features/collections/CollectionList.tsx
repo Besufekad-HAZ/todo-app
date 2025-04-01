@@ -1,7 +1,8 @@
 // src/features/collections/CollectionList.tsx
 import { useGetCollectionsQuery, useToggleFavoriteMutation } from '../../services/api';
 import { StarIcon } from '@heroicons/react/24/solid';
-import { ProgressBar } from '../ui/ProgressBar';
+import { ProgressBar } from '../../components/ui/ProgressBar';
+import { Collection } from '../../types/types';
 
 export function CollectionList({ onSelect }: { onSelect: (id: number) => void }) {
   const { data: collections } = useGetCollectionsQuery();
