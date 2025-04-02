@@ -1,33 +1,3 @@
-import { useEffect } from 'react';
-import { Dialog } from '@headlessui/react';
-
-export function MobileSidebar({
-  isOpen,
-  onClose,
-  children,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  children: React.ReactNode;
-}) {
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
-
-  return (
-    <Dialog as="div" className="md:hidden fixed inset-0 z-50" open={isOpen} onClose={onClose}>
-      <div className="fixed inset-0 bg-black/60" />
-      <div className="fixed inset-y-0 left-0 w-64 bg-gray-800 shadow-lg">
-        <Dialog.Panel className="h-full overflow-y-auto">{children}</Dialog.Panel>
-      </div>
-    </Dialog>
-  );
-}
-
 // src/features/collections/CollectionsGrid.tsx
 import { useState } from 'react';
 import { useGetCollectionsQuery, useToggleFavoriteMutation } from '../../services/api';
@@ -42,8 +12,7 @@ export function CollectionsGrid({ onSelect }: CollectionsGridProps) {
   const [toggleFavorite] = useToggleFavoriteMutation();
   const [activeTab, setActiveTab] = useState<'favorites' | 'all'>('all');
 
-  if (isLoading)
-    return <div className="text-center py-8 text-gray-400">Loading collections...</div>;
+  if (isLoading) return <div className="text-center">Loading collections...</div>;
 
   const displayedCollections =
     activeTab === 'favorites' ? collections?.filter((c) => c.isFavorite) : collections;
@@ -117,14 +86,11 @@ function CollectionCard({ collection, onSelect, onToggleFavorite }: CollectionCa
 
   // Get color based on collection name
   const getIconBgColor = (name: string) => {
-    const colors: Record<string, string> = {
-      School: 'bg-pink-500',
-      Personal: 'bg-teal-500',
-      Design: 'bg-purple-500',
-      Groceries: 'bg-yellow-500',
-    };
+    const colors = ['bg-pink-500', 'bg-teal-500', 'bg-purple-500', 'bg-yellow-500'];
 
-    return colors[name] || 'bg-gray-500';
+    // Simple hash function to get consistent colors for the same name
+    const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return colors[hash % colors.length];
   };
 
   const getIcon = (name: string) => {
@@ -143,7 +109,7 @@ function CollectionCard({ collection, onSelect, onToggleFavorite }: CollectionCa
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998a12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"
+            d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"
           />
         </svg>
       ),
@@ -217,17 +183,6 @@ function CollectionCard({ collection, onSelect, onToggleFavorite }: CollectionCa
     );
   };
 
-  const getProgressColor = (name: string) => {
-    const colors: Record<string, string> = {
-      School: 'bg-pink-500',
-      Personal: 'bg-teal-500',
-      Design: 'bg-purple-500',
-      Groceries: 'bg-yellow-500',
-    };
-
-    return completionPercentage === 100 ? 'bg-green-500' : colors[name] || 'bg-gray-500';
-  };
-
   return (
     <div
       onClick={() => onSelect(collection.id)}
@@ -268,7 +223,7 @@ function CollectionCard({ collection, onSelect, onToggleFavorite }: CollectionCa
         <div className="mt-3 mb-2">
           <h3 className="font-medium text-white">{collection.name}</h3>
           <div className="text-xs text-gray-400 mt-1">
-            {collection.taskCount
+            {collection.taskCount > 0
               ? `${collection.completedCount || 0}/${collection.taskCount} done`
               : 'No tasks yet'}
           </div>
@@ -277,7 +232,17 @@ function CollectionCard({ collection, onSelect, onToggleFavorite }: CollectionCa
         <div className="mt-auto">
           <div className="w-full bg-gray-700 rounded-full h-1 mb-1">
             <div
-              className={`h-1 rounded-full ${getProgressColor(collection.name)}`}
+              className={`h-1 rounded-full ${
+                completionPercentage === 100
+                  ? 'bg-green-500'
+                  : collection.name === 'School'
+                    ? 'bg-pink-500'
+                    : collection.name === 'Personal'
+                      ? 'bg-teal-500'
+                      : collection.name === 'Design'
+                        ? 'bg-purple-500'
+                        : 'bg-yellow-500'
+              }`}
               style={{ width: `${completionPercentage}%` }}
             ></div>
           </div>

@@ -1,7 +1,5 @@
-// src/features/tasks/TaskForm.tsx
 import { useState } from 'react';
 import { useCreateTaskMutation } from '../../services/api';
-import { XMarkIcon } from '@heroicons/react/24/outline';
 
 export function TaskForm({
   collectionId,
@@ -14,6 +12,8 @@ export function TaskForm({
 }) {
   const [title, setTitle] = useState('');
   const [date, setDate] = useState('');
+  const [selectedCollection, setSelectedCollection] = useState<string>('Design');
+  const [selectedTags, setSelectedTags] = useState<string[]>(['Today']);
   const [subtasks, setSubtasks] = useState<string[]>(['']);
   const [createTask] = useCreateTaskMutation();
 
@@ -50,112 +50,92 @@ export function TaskForm({
     }
   };
 
-  const handleAddSubtask = () => {
-    setSubtasks([...subtasks, '']);
-  };
-
-  const handleSubtaskChange = (index: number, value: string) => {
-    const newSubtasks = [...subtasks];
-    newSubtasks[index] = value;
-    setSubtasks(newSubtasks);
-  };
-
-  const removeSubtask = (index: number) => {
-    const newSubtasks = subtasks.filter((_, i) => i !== index);
-    setSubtasks(newSubtasks);
+  const toggleTag = (tag: string) => {
+    if (selectedTags.includes(tag)) {
+      setSelectedTags(selectedTags.filter((t) => t !== tag));
+    } else {
+      setSelectedTags([...selectedTags, tag]);
+    }
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-hidden">
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-          <h2 className="text-lg font-semibold">{parentId ? 'Add Subtask' : 'Add New Task'}</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300"
-          >
-            <XMarkIcon className="h-6 w-6" />
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="p-4 overflow-y-auto">
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Title*
-            </label>
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+      <div className="bg-gray-800 rounded-lg shadow-xl w-full max-w-md overflow-hidden border border-gray-700">
+        <form onSubmit={handleSubmit} className="overflow-y-auto">
+          <div className="p-4">
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Task title"
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+              placeholder="Finish hero section"
+              className="w-full px-3 py-3 bg-gray-700 border border-gray-600 rounded-md focus:ring-pink-500 focus:border-pink-500 text-white text-base mb-4"
               required
               autoFocus
             />
-          </div>
 
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Due Date
-            </label>
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white text-sm"
-            />
-          </div>
-
-          {!parentId && (
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Subtasks
-              </label>
-              <div className="space-y-2">
-                {subtasks.map((subtask, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      value={subtask}
-                      onChange={(e) => handleSubtaskChange(index, e.target.value)}
-                      placeholder={`Subtask ${index + 1}`}
-                      className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                    />
-                    {subtasks.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeSubtask(index)}
-                        className="text-gray-400 hover:text-red-500"
-                      >
-                        <XMarkIcon className="h-5 w-5" />
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
+            {/* Collection & Tags Selection */}
+            <div className="flex flex-wrap gap-2 mb-4">
+              {/* Collection */}
               <button
                 type="button"
-                onClick={handleAddSubtask}
-                className="mt-2 text-sm text-blue-500 hover:text-blue-600 dark:hover:text-blue-400"
+                className="flex items-center gap-1 px-3 py-1.5 bg-purple-900/50 text-purple-300 rounded-md text-sm"
               >
-                + Add another subtask
+                <span className="w-3 h-3 rounded-sm bg-purple-500"></span>
+                Design
+              </button>
+
+              {/* Today */}
+              <button
+                type="button"
+                className={`px-3 py-1.5 rounded-md text-sm ${
+                  selectedTags.includes('Today')
+                    ? 'bg-green-500 text-white'
+                    : 'bg-gray-700 text-green-400 hover:bg-gray-600'
+                }`}
+                onClick={() => toggleTag('Today')}
+              >
+                Today
+              </button>
+
+              {/* Flag */}
+              <button
+                type="button"
+                className={`px-3 py-1.5 rounded-md text-sm ${
+                  selectedTags.includes('Flag')
+                    ? 'bg-red-500 text-white'
+                    : 'bg-gray-700 text-red-400 hover:bg-gray-600'
+                }`}
+                onClick={() => toggleTag('Flag')}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z"
+                    clipRule="evenodd"
+                  />
+                </svg>
               </button>
             </div>
-          )}
+          </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex">
+            <button
+              type="submit"
+              className="flex-1 py-3 font-medium text-white bg-pink-500 hover:bg-pink-600 transition-colors"
+            >
+              Add Task
+            </button>
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+              className="flex-1 py-3 font-medium text-gray-300 hover:bg-gray-700 transition-colors"
             >
               Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-md shadow-sm transition-colors"
-            >
-              {parentId ? 'Add Subtask' : 'Add Task'}
             </button>
           </div>
         </form>

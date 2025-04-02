@@ -1,9 +1,9 @@
-export function LoadingSpinner({ size = 5 }: { size?: number }) {
+export function LoadingSpinner({ size = 6 }: { size?: number }) {
+  const sizeClass = `w-${size} h-${size}`;
+
   return (
     <div
-      className={`inline-block h-${size} w-${size} animate-spin rounded-full border-2 border-solid border-current border-r-transparent`}
-    >
-      <span className="sr-only">Loading...</span>
-    </div>
+      className={`${sizeClass} animate-spin rounded-full border-t-2 border-r-2 border-pink-500 border-opacity-50`}
+    ></div>
   );
 }
