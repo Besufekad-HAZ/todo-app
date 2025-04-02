@@ -29,15 +29,15 @@ function CollectionCard({ collection, onSelect, onToggleFavorite }: CollectionCa
   const normalizedCollectionName = collection.name.toLowerCase().trim();
 
   // Mutation for completing task
-  const [completeTask] = useCompleteTaskMutation();
-  const handleCompleteTask = async (taskId: number) => {
-    try {
-      await completeTask(taskId).unwrap();
-      // RTK Query will handle cache invalidation automatically
-    } catch (error) {
-      console.error('Failed to complete task:', error);
-    }
-  };
+  // const [completeTask] = useCompleteTaskMutation();
+  // const handleCompleteTask = async (taskId: number) => {
+  //   try {
+  //     await completeTask(taskId).unwrap();
+  //     // RTK Query will handle cache invalidation automatically
+  //   } catch (error) {
+  //     console.error('Failed to complete task:', error);
+  //   }
+  // };
 
   const getIcon = () => {
     switch (normalizedCollectionName) {
