@@ -1,4 +1,3 @@
-//// filepath: /home/bese/All projects/todo-app/packages/frontend/src/features/tasks/TaskItem.tsx
 import { useState, useCallback } from 'react';
 import { Task } from '../../types/types';
 import {
@@ -7,9 +6,11 @@ import {
   useUpdateTaskMutation,
 } from '../../services/api';
 import { CheckCircleIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { GripVertical, PlusIcon } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { GripVertical } from 'lucide-react';
 import { SortableSubtasksList } from './SortableSubtaskList';
+import { TaskForm } from './TaskForm';
+
 export function TaskItem({
   task,
   depth = 0,
@@ -25,38 +26,35 @@ export function TaskItem({
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(task.title);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showAddSubtaskForm, setShowAddSubtaskForm] = useState(false);
   const [pressTimer, setPressTimer] = useState<NodeJS.Timeout | null>(null);
 
-  // Use the new mutation for completing task + subtasks:
-  const [completeTaskWithSubtasks] = useCompleteTaskWithSubtasksMutation();
+  const [completeTask] = useCompleteTaskWithSubtasksMutation();
   const [deleteTask] = useDeleteTaskMutation();
   const [updateTask] = useUpdateTaskMutation();
 
-  // Long-press handlers
+  // Handlers
   const handleTouchStart = useCallback(() => {
-    const timer = setTimeout(() => {
-      setShowDeleteConfirm(true);
-    }, 800);
+    const timer = setTimeout(() => setShowDeleteConfirm(true), 800);
     setPressTimer(timer);
   }, []);
 
   const handleTouchEnd = useCallback(() => {
     if (pressTimer) {
       clearTimeout(pressTimer);
-      setPressTimer(null);
     }
+    setPressTimer(null);
   }, [pressTimer]);
 
   const handleComplete = async () => {
     try {
-      await completeTaskWithSubtasks({ id: task.id, complete: !task.completed }).unwrap();
+      await completeTask({ id: task.id, complete: !task.completed }).unwrap();
       onTaskUpdated?.();
     } catch (error) {
       toast.error('Failed to update task');
     }
   };
 
-  // In TaskItem component
   const handleDelete = async () => {
     try {
       await deleteTask(task.id).unwrap();
@@ -72,15 +70,14 @@ export function TaskItem({
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (editTitle.trim()) {
-      await updateTask({ id: task.id, title: editTitle });
+      await updateTask({ id: task.id, title: editTitle }).unwrap();
       setIsEditing(false);
       onTaskUpdated?.();
     }
   };
 
-  // Toggle subtask visibility
-  const hasSubtasks = task.subtasks && task.subtasks.length > 0;
   const toggleExpand = () => setIsExpanded(!isExpanded);
+  const hasSubtasks = task.subtasks && task.subtasks.length > 0;
 
   return (
     <div
@@ -144,6 +141,8 @@ export function TaskItem({
           >
             <GripVertical className="h-4 w-4" />
           </button>
+
+          {/* Completion checkbox */}
           <button
             onClick={handleComplete}
             className={`mt-0.5 flex-shrink-0 h-5 w-5 rounded-full border flex items-center justify-center transition-colors ${
@@ -151,6 +150,7 @@ export function TaskItem({
                 ? 'bg-primary-500 border-primary-500 text-white'
                 : 'border-gray-300 dark:border-gray-500 hover:border-primary-300'
             }`}
+            aria-label={task.completed ? 'Mark incomplete' : 'Mark complete'}
           >
             {task.completed && (
               <svg className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
@@ -163,16 +163,15 @@ export function TaskItem({
             )}
           </button>
 
+          {/* Task content */}
           <div className="flex-1 min-w-0">
-            <div
-              className={`flex items-center justify-between ${
-                task.completed
-                  ? 'text-gray-400 dark:text-gray-500'
-                  : 'text-gray-800 dark:text-gray-100'
-              }`}
-              onDoubleClick={() => setIsEditing(true)}
-            >
-              <span className={`flex-1 ${task.completed ? 'line-through' : ''}`}>{task.title}</span>
+            <div className="flex items-center justify-between pr-14">
+              <span
+                className={`flex-1 ${task.completed ? 'line-through' : ''}`}
+                onDoubleClick={() => setIsEditing(true)}
+              >
+                {task.title}
+              </span>
               {task.date && (
                 <span className="ml-2 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
                   {new Date(task.date).toLocaleDateString()}
@@ -180,26 +179,36 @@ export function TaskItem({
               )}
             </div>
 
-            {/* Edit/Delete buttons on hover */}
-            <div className="absolute right-3 top-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            {/* Hover actions */}
+            <div className="absolute right-3 top-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white dark:bg-gray-800 px-2 py-1 rounded-md shadow-sm border border-gray-200 dark:border-gray-700">
               <button
                 onClick={() => setIsEditing(true)}
-                className="p-1 text-gray-400 hover:text-primary-500 dark:hover:text-primary-400"
+                className="text-gray-400 hover:text-primary-500 dark:hover:text-primary-400"
                 title="Edit"
               >
                 <PencilIcon className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setShowDeleteConfirm(true)}
-                className="p-1 text-gray-400 hover:text-red-500 dark:hover:text-red-400"
+                className="text-gray-400 hover:text-red-500 dark:hover:text-red-400"
                 title="Delete"
               >
                 <TrashIcon className="w-4 h-4" />
               </button>
+              {depth === 0 && (
+                <button
+                  onClick={() => setShowAddSubtaskForm(true)}
+                  className="text-gray-400 hover:text-green-500 dark:hover:text-green-400"
+                  title="Add Subtask"
+                >
+                  <PlusIcon className="w-4 h-4" />
+                </button>
+              )}
             </div>
           </div>
         </div>
       )}
+
       {/* Delete Confirmation Dialog */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
@@ -225,6 +234,16 @@ export function TaskItem({
           </div>
         </div>
       )}
+
+      {/* Add Subtask Form */}
+      {showAddSubtaskForm && (
+        <TaskForm
+          collectionId={task.collectionId}
+          parentId={task.id}
+          onClose={() => setShowAddSubtaskForm(false)}
+        />
+      )}
+
       {/* Subtasks */}
       {isExpanded && hasSubtasks && (
         <SortableSubtasksList

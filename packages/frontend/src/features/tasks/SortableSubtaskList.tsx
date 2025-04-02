@@ -1,4 +1,3 @@
-// src/features/tasks/SortableSubtasksList.tsx
 import {
   DndContext,
   closestCenter,
@@ -11,6 +10,7 @@ import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { SortableTaskItem } from './SortableTaskItem';
 import { Task } from '../../types/types';
 import { useUpdateTaskMutation } from '../../services/api';
+import { arrayMove } from '@dnd-kit/sortable';
 
 interface SortableSubtasksListProps {
   subtasks: Task[];
@@ -40,12 +40,23 @@ export function SortableSubtasksList({
       const newIndex = subtasks.findIndex((task) => task.id === over.id);
 
       if (oldIndex !== -1 && newIndex !== -1) {
-        // Update the order in the database
+        // Create a new array with the updated order
+        const updatedSubtasks = arrayMove(subtasks, oldIndex, newIndex);
+
+        // Update all affected tasks in the database
         try {
-          await updateTask({
-            id: active.id,
-            order: newIndex,
-          }).unwrap();
+          const updatePromises = updatedSubtasks.map((task, index) => {
+            // Only update if the position changed
+            if (task.order !== index) {
+              return updateTask({
+                id: task.id,
+                order: index,
+              }).unwrap();
+            }
+            return Promise.resolve();
+          });
+
+          await Promise.all(updatePromises);
           onTaskUpdated?.();
         } catch (error) {
           console.error('Failed to update task order:', error);
