@@ -9,6 +9,8 @@ export interface Collection {
   isFavorite: boolean;
   taskCount?: number;
   completedCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // src/types/types.ts

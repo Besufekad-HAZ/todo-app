@@ -30,3 +30,7 @@ export const toggleFavorite = async (id: number): Promise<Collection> => {
     data: { isFavorite: !collection?.isFavorite },
   });
 };
+export function createCollection(name: string) {
+  throw new Error('Function not implemented.');
+}
+
