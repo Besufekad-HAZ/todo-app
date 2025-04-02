@@ -42,7 +42,6 @@ export const createTask: RequestHandler<
   }
 };
 
-
 export const completeTask = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {

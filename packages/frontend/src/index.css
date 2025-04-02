@@ -1,5 +1,5 @@
 /* src/index.css */
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
   --color-text: 23 23 23;
@@ -17,7 +17,9 @@
   body {
     color: rgb(var(--color-text));
     background-color: rgb(var(--color-bg));
-    transition: color 200ms, background-color 200ms;
+    transition:
+      color 200ms,
+      background-color 200ms;
   }
 
   .btn-primary {
@@ -48,7 +50,6 @@
     border-radius: 0.375rem;
   }
 }
-
 
 /* Add to your index.css */
 @layer components {
