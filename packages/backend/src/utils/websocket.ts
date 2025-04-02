@@ -32,3 +32,5 @@ export function setupWebSocket(server: Server) {
   // Return the broadcast function for use in other parts of the app
   return { broadcast };
 }
+
+// export default setupWebSocket;
