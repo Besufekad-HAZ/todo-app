@@ -2,12 +2,25 @@ import { PrismaClient, Collection } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export const createCollection = async (name: string): Promise<Collection> => {
-  return prisma.collection.create({ data: { name } });
-};
+export const getCollections = async (): Promise<
+  (Collection & { taskCount: number; completedCount: number })[]
+> => {
+  const collections = await prisma.collection.findMany({
+    include: {
+      tasks: {
+        select: {
+          id: true,
+          completed: true,
+        },
+      },
+    },
+  });
 
-export const getCollections = async (): Promise<Collection[]> => {
-  return prisma.collection.findMany();
+  return collections.map((collection) => ({
+    ...collection,
+    taskCount: collection.tasks.length,
+    completedCount: collection.tasks.filter((task) => task.completed).length,
+  }));
 };
 
 export const toggleFavorite = async (id: number): Promise<Collection> => {
