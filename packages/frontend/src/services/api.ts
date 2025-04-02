@@ -5,7 +5,7 @@ import type { Collection, Task } from '../types/types';
 export const api = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:5000/api' }),
-  tagTypes: ['Collection', 'Task'],
+  tagTypes: ['Collection', 'Task', 'CollectionStats'],
   endpoints: (builder) => ({
     // Collections
     getCollections: builder.query<Collection[], void>({
@@ -71,19 +71,28 @@ export const api = createApi({
     }),
 
     // New endpoint: complete task + subtasks
+    // In api.ts
     completeTaskWithSubtasks: builder.mutation<Task, { id: number; complete: boolean }>({
       query: ({ id, complete }) => ({
         url: `tasks/${id}/complete-with-subtasks`,
         method: 'PATCH',
         body: { complete },
       }),
-      invalidatesTags: (result) =>
-        result?.collectionId ? [{ type: 'Task', id: result.collectionId }] : [],
+      invalidatesTags: (result) => [
+        { type: 'Task', id: result?.collectionId },
+        { type: 'Collection', id: result?.collectionId },
+        { type: 'CollectionStats', id: result?.collectionId },
+      ],
     }),
     // In your api.ts file, add these endpoints
+    // In api.ts
+
     getCollectionStats: builder.query<{ taskCount: number; completedCount: number }, number>({
       query: (collectionId) => `collections/${collectionId}/stats`,
-      providesTags: (result, error, arg) => [{ type: 'Collection', id: arg }],
+      providesTags: (result, error, arg) => [
+        { type: 'CollectionStats', id: arg },
+        { type: 'Collection', id: arg },
+      ],
     }),
     updateCollectionStats: builder.mutation<void, number>({
       query: (collectionId) => ({
@@ -105,4 +114,5 @@ export const {
   useDeleteTaskMutation,
   useCompleteTaskWithSubtasksMutation,
   useGetCollectionStatsQuery,
+  useUpdateCollectionStatsMutation,
 } = api;

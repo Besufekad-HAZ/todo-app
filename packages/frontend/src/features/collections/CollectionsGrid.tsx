@@ -1,9 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   useGetCollectionsQuery,
   useToggleFavoriteMutation,
   useGetCollectionStatsQuery,
-  // useCompleteTaskMutation, // <-- import mutation
 } from '../../services/api';
 import { Collection } from '../../types/types';
 import { FaSchool, FaUser, FaPaintBrush, FaShoppingCart, FaPlus, FaStar } from 'react-icons/fa';
@@ -19,31 +18,44 @@ interface CollectionCardProps {
 }
 
 function CollectionCard({ collection, onSelect, onToggleFavorite }: CollectionCardProps) {
-  // Fetch real-time stats
-  const { data: stats } = useGetCollectionStatsQuery(collection.id, {
-    pollingInterval: 30000,
+  // Add refetch function to stats query
+  const {
+    data: stats,
+    isFetching,
+    refetch,
+  } = useGetCollectionStatsQuery(collection.id, {
+    pollingInterval: 3000,
+    refetchOnMountOrArgChange: true,
   });
 
-  // Use stats if available, fallback to collection data, ensuring taskCount and completedCount are numbers
-  const taskCount = stats?.taskCount ?? collection.taskCount ?? 0;
-  const completedCount = stats?.completedCount ?? collection.completedCount ?? 0;
+  // Force immediate refetch when collection updates
+  useEffect(() => {
+    const timer = setTimeout(() => refetch(), 500);
+    return () => clearTimeout(timer);
+  }, [collection.taskCount, collection.completedCount, refetch]);
 
-  // Fix percentage calculation
-  const completionPercentage =
-    taskCount > 0 ? Math.min(100, Math.round(((completedCount ?? 0) / taskCount) * 100)) : 0;
+  // Use only stats data when available to avoid inconsistencies
+  const taskCount = stats?.taskCount ?? 0;
+  const completedCount = stats?.completedCount ?? 0;
+
+  // Precise percentage calculation
+  const completionPercentage = useMemo(() => {
+    if (taskCount <= 0) return 0;
+    const calculated = (completedCount / taskCount) * 100;
+    return Math.min(100, Math.max(0, Math.round(calculated)));
+  }, [taskCount, completedCount]);
+
+  // Debug output
+  useEffect(() => {
+    console.log(`Collection ${collection.id} Stats:`, {
+      taskCount,
+      completedCount,
+      calculatedPercentage: completionPercentage,
+      isFetching,
+    });
+  }, [collection.id, taskCount, completedCount, completionPercentage, isFetching]);
 
   const normalizedCollectionName = collection.name.toLowerCase().trim();
-
-  // Mutation for completing task
-  // const [completeTask] = useCompleteTaskMutation();
-  // const handleCompleteTask = async (taskId: number) => {
-  //   try {
-  //     await completeTask(taskId).unwrap();
-  //     // RTK Query will handle cache invalidation automatically
-  //   } catch (error) {
-  //     console.error('Failed to complete task:', error);
-  //   }
-  // };
 
   const getIcon = () => {
     switch (normalizedCollectionName) {
@@ -94,6 +106,7 @@ function CollectionCard({ collection, onSelect, onToggleFavorite }: CollectionCa
     const radius = 18;
     const circumference = 2 * Math.PI * radius;
     const strokeDashoffset = circumference - (percentage / 100) * circumference;
+
     return (
       <div className="relative w-12 h-12 flex items-center justify-center">
         <svg className="w-full h-full" viewBox="0 0 40 40">
@@ -118,16 +131,17 @@ function CollectionCard({ collection, onSelect, onToggleFavorite }: CollectionCa
             transform="rotate(-90 20 20)"
           />
         </svg>
-        <span className="absolute text-white text-xs font-medium">{percentage}%</span>
+        <span className="absolute text-white text-xs font-medium">
+          {isFetching ? '...' : `${percentage.toFixed(0)}%`}
+        </span>
       </div>
     );
   };
 
   const getCompletionText = () => {
-    if (collection.taskCount === 0) return 'No tasks yet';
-    if (collection.completedCount === collection.taskCount)
-      return `All ${collection.taskCount} done!`;
-    return `${collection.completedCount}/${collection.taskCount} done`;
+    if (taskCount === 0) return 'No tasks yet';
+    if (completedCount === taskCount) return `All ${taskCount} done!`;
+    return `${completedCount}/${taskCount} done`;
   };
 
   return (
@@ -155,20 +169,10 @@ function CollectionCard({ collection, onSelect, onToggleFavorite }: CollectionCa
       </div>
       <div className="mt-4 flex-grow flex flex-col justify-center items-center">
         <h3 className="font-medium text-white text-xl sm:text-2xl mb-3">
-          {collection.name.charAt(0).toLocaleUpperCase() + collection.name.slice(1)}
+          {collection.name.charAt(0).toUpperCase() + collection.name.slice(1)}
         </h3>
         <CircularProgress percentage={completionPercentage} color={getProgressColor()} />
         <div className="mt-3 text-xs sm:text-sm text-gray-300">{getCompletionText()}</div>
-        {/* New button to complete a task (using collection.id as demo taskId)
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            handleCompleteTask(collection.id);
-          }}
-          className="mt-2 px-3 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600 transition-colors"
-        >
-          Complete Task
-        </button> */}
       </div>
     </div>
   );
@@ -220,7 +224,6 @@ export function CollectionsGrid({ onSelect }: CollectionsGridProps) {
             onToggleFavorite={toggleFavorite}
           />
         ))}
-        {/* Add Collection Card */}
         <div className="bg-gray-800 rounded-lg p-4 flex items-center justify-center border border-gray-700 hover:bg-gray-700 cursor-pointer transition-colors h-52">
           <div className="flex flex-col items-center text-gray-400 hover:text-gray-300">
             <FaPlus className="h-8 w-8" />

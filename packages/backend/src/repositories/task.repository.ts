@@ -1,4 +1,5 @@
 import { PrismaClient, Task } from '@prisma/client';
+import { invalidateStatsCache } from './collection.repository';
 
 const prisma = new PrismaClient();
 
@@ -11,11 +12,11 @@ export const createTask = async (taskData: {
   return prisma.task.create({ data: taskData });
 };
 
+// In task.repository.ts
 export const completeTaskWithSubtasks = async (taskId: number, complete: boolean) => {
-  // First get the task to know its collectionId
   const task = await prisma.task.findUnique({
     where: { id: taskId },
-    select: { collectionId: true },
+    select: { collectionId: true }
   });
 
   if (!task) throw new Error('Task not found');
@@ -23,18 +24,16 @@ export const completeTaskWithSubtasks = async (taskId: number, complete: boolean
   await prisma.$transaction([
     prisma.task.update({
       where: { id: taskId },
-      data: { completed: complete },
+      data: { completed: complete }
     }),
     prisma.task.updateMany({
       where: { parentId: taskId },
-      data: { completed: complete },
-    }),
-    // This ensures the collection stats are recalculated
-    prisma.collection.update({
-      where: { id: task.collectionId },
-      data: { updatedAt: new Date() }, // Just touch the collection
-    }),
+      data: { completed: complete }
+    })
   ]);
+
+  // Force invalidate the cache
+  invalidateStatsCache(task.collectionId);
 };
 
 export const getTasksByCollection = async (collectionId: number): Promise<Task[]> => {

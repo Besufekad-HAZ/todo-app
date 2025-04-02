@@ -1,7 +1,14 @@
 import { PrismaClient, Collection } from '@prisma/client';
 
 const prisma = new PrismaClient();
-const statsCache = new Map<number, { taskCount: number; completedCount: number }>();
+const statsCache = new Map<
+  number,
+  {
+    taskCount: number;
+    completedCount: number;
+    lastUpdated: Date;
+  }
+>();
 
 export const getCollections = async (): Promise<
   (Collection & { taskCount: number; completedCount: number })[]
@@ -25,9 +32,10 @@ export const getCollections = async (): Promise<
 };
 
 export const getCollectionStats = async (id: number) => {
-  // Check cache first
-  if (statsCache.has(id)) {
-    return statsCache.get(id)!;
+  // Cache with 1-second freshness check
+  const cached = statsCache.get(id);
+  if (cached && new Date().getTime() - cached.lastUpdated.getTime() < 1000) {
+    return cached;
   }
 
   const collection = await prisma.collection.findUnique({
@@ -42,22 +50,20 @@ export const getCollectionStats = async (id: number) => {
     },
   });
 
-  if (!collection) {
-    throw new Error('Collection not found');
-  }
+  if (!collection) throw new Error('Collection not found');
 
   const stats = {
     taskCount: collection.tasks.length,
-    completedCount: collection.tasks.filter((task) => task.completed).length,
+    completedCount: collection.tasks.filter((t) => t.completed).length,
+    lastUpdated: new Date(),
   };
 
-  // Cache the result
   statsCache.set(id, stats);
   return stats;
 };
 
-export const invalidateCollectionStatsCache = (id: number) => {
-  statsCache.delete(id);
+export const invalidateStatsCache = (collectionId: number) => {
+  statsCache.delete(collectionId);
 };
 
 export const updateCollectionStats = async (id: number) => {
