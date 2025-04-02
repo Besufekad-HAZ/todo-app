@@ -1,6 +1,7 @@
 import { useGetCollectionsQuery, useToggleFavoriteMutation } from '../../services/api';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Collection } from '../../types/types';
+import { FaSchool, FaUser, FaPaintBrush, FaShoppingCart, FaPlus } from 'react-icons/fa';
 
 interface CollectionListProps {
   onSelect: (id: number) => void;
@@ -25,8 +26,6 @@ export function CollectionList({ onSelect, viewMode = 'sidebar' }: CollectionLis
     <div className="w-full h-full overflow-y-auto">
       <div className="p-4">
         <h2 className="text-lg font-semibold text-gray-300 mb-4">Collections</h2>
-
-        {/* Collections */}
         <div className="space-y-1">
           {collections?.map((collection) => (
             <SidebarCollectionItem
@@ -52,106 +51,34 @@ interface SidebarCollectionItemProps {
 }
 
 function SidebarCollectionItem({ collection, isActive, onSelect }: SidebarCollectionItemProps) {
-  // Get color based on collection name
-  const getIconBgColor = (name: string) => {
-    const colors: Record<string, string> = {
-      School: 'bg-pink-500',
-      Personal: 'bg-teal-500',
-      Design: 'bg-purple-500',
-      Groceries: 'bg-yellow-500',
-    };
+  // Normalize name for matching
+  const normalizedName = collection.name.toLowerCase().trim();
 
-    return colors[name] || 'bg-gray-500';
+  const getIcon = () => {
+    switch (normalizedName) {
+      case 'school':
+        return <FaSchool className="h-5 w-5 text-white" />;
+      case 'personal':
+        return <FaUser className="h-5 w-5 text-white" />;
+      case 'design':
+        return <FaPaintBrush className="h-5 w-5 text-white" />;
+      case 'groceries':
+        return <FaShoppingCart className="h-5 w-5 text-white" />;
+      default:
+        return <FaPlus className="h-5 w-5 text-white" />;
+    }
   };
 
-  const getIcon = (name: string) => {
-    const icons: Record<string, React.ReactNode> = {
-      School: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path d="M12 14l9-5-9-5-9 5 9 5z" />
-          <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998a12.078 12.078 0 01.665-6.479L12 14z" />
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998a12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"
-          />
-        </svg>
-      ),
-      Personal: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-          />
-        </svg>
-      ),
-      Design: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-          />
-        </svg>
-      ),
-      Groceries: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-          />
-        </svg>
-      ),
+  // Use the same mapping as CollectionsGrid.
+  // If a name doesn't match, fallback to the "school" color (pink) rather than gray.
+  const getIconBgColor = (name: string) => {
+    const mapping: Record<string, string> = {
+      school: 'bg-pink-500',
+      personal: 'bg-teal-500',
+      design: 'bg-purple-500',
+      groceries: 'bg-yellow-500',
     };
-
-    return (
-      icons[name] || (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-          />
-        </svg>
-      )
-    );
+    return mapping[name.toLowerCase().trim()] || 'bg-pink-500';
   };
 
   return (
@@ -164,10 +91,9 @@ function SidebarCollectionItem({ collection, isActive, onSelect }: SidebarCollec
       <div
         className={`w-8 h-8 rounded-lg ${getIconBgColor(collection.name)} flex items-center justify-center text-white mr-3`}
       >
-        {getIcon(collection.name)}
+        {getIcon()}
       </div>
       <span className="text-white font-medium">{collection.name}</span>
     </div>
   );
 }
-
