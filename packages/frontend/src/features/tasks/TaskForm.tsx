@@ -244,9 +244,11 @@ export function TaskForm({
                       options: {
                         boundary: document.body,
                       },
-                      fn: function (state: MiddlewareState): MiddlewareReturn | Promise<MiddlewareReturn> {
+                      fn: function (
+                        state: MiddlewareState,
+                      ): MiddlewareReturn | Promise<MiddlewareReturn> {
                         throw new Error('Function not implemented.');
-                      }
+                      },
                     },
                   ]}
                   calendarClassName="bg-gray-900 text-white border border-gray-700 rounded-lg shadow-lg p-4"

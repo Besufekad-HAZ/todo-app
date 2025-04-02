@@ -3,7 +3,7 @@ import {
   useGetCollectionsQuery,
   useToggleFavoriteMutation,
   useGetCollectionStatsQuery,
-  useCompleteTaskMutation, // <-- import mutation
+  // useCompleteTaskMutation, // <-- import mutation
 } from '../../services/api';
 import { Collection } from '../../types/types';
 import { FaSchool, FaUser, FaPaintBrush, FaShoppingCart, FaPlus, FaStar } from 'react-icons/fa';
@@ -23,9 +23,15 @@ function CollectionCard({ collection, onSelect, onToggleFavorite }: CollectionCa
   const { data: stats } = useGetCollectionStatsQuery(collection.id, {
     pollingInterval: 30000,
   });
-  const taskCount = stats?.taskCount ?? collection.taskCount;
-  const completedCount = stats?.completedCount ?? collection.completedCount;
-  const completionPercentage = taskCount ? Math.round(((completedCount || 0) / taskCount) * 100) : 0;
+
+  // Use stats if available, fallback to collection data, ensuring taskCount and completedCount are numbers
+  const taskCount = stats?.taskCount ?? collection.taskCount ?? 0;
+  const completedCount = stats?.completedCount ?? collection.completedCount ?? 0;
+
+  // Fix percentage calculation
+  const completionPercentage =
+    taskCount > 0 ? Math.min(100, Math.round(((completedCount ?? 0) / taskCount) * 100)) : 0;
+
   const normalizedCollectionName = collection.name.toLowerCase().trim();
 
   // Mutation for completing task
@@ -130,7 +136,9 @@ function CollectionCard({ collection, onSelect, onToggleFavorite }: CollectionCa
       className="bg-gray-800 rounded-lg p-4 cursor-pointer hover:bg-gray-700 transition-colors border border-gray-700 h-52 flex flex-col"
     >
       <div className="flex justify-between items-start">
-        <div className={`w-10 h-10 rounded-lg ${getIconBgColor()} flex items-center justify-center`}>
+        <div
+          className={`w-10 h-10 rounded-lg ${getIconBgColor()} flex items-center justify-center`}
+        >
           {getIcon()}
         </div>
         <button
@@ -140,7 +148,9 @@ function CollectionCard({ collection, onSelect, onToggleFavorite }: CollectionCa
           }}
           className="text-gray-400 hover:text-yellow-400"
         >
-          <FaStar className={`h-5 w-5 ${collection.isFavorite ? 'text-yellow-400 fill-current' : ''}`} />
+          <FaStar
+            className={`h-5 w-5 ${collection.isFavorite ? 'text-yellow-400 fill-current' : ''}`}
+          />
         </button>
       </div>
       <div className="mt-4 flex-grow flex flex-col justify-center items-center">
@@ -181,7 +191,9 @@ export function CollectionsGrid({ onSelect }: CollectionsGridProps) {
         <div className="flex space-x-2">
           <button
             className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
-              activeTab === 'favorites' ? 'bg-gray-800 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              activeTab === 'favorites'
+                ? 'bg-gray-800 text-white'
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
             }`}
             onClick={() => setActiveTab('favorites')}
           >
@@ -189,7 +201,9 @@ export function CollectionsGrid({ onSelect }: CollectionsGridProps) {
           </button>
           <button
             className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
-              activeTab === 'all' ? 'bg-gray-800 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              activeTab === 'all'
+                ? 'bg-gray-800 text-white'
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
             }`}
             onClick={() => setActiveTab('all')}
           >

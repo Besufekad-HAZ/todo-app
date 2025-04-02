@@ -1,5 +1,5 @@
-import { useNavigate } from "react-router-dom";
-import { CollectionsGrid } from "./CollectionsGrid";
+import { useNavigate } from 'react-router-dom';
+import { CollectionsGrid } from './CollectionsGrid';
 
 export function CollectionsPage() {
   const navigate = useNavigate();
