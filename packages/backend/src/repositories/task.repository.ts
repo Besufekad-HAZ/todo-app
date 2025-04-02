@@ -12,6 +12,14 @@ export const createTask = async (taskData: {
 };
 
 export const completeTaskWithSubtasks = async (taskId: number, complete: boolean) => {
+  // First get the task to know its collectionId
+  const task = await prisma.task.findUnique({
+    where: { id: taskId },
+    select: { collectionId: true },
+  });
+
+  if (!task) throw new Error('Task not found');
+
   await prisma.$transaction([
     prisma.task.update({
       where: { id: taskId },
@@ -20,6 +28,11 @@ export const completeTaskWithSubtasks = async (taskId: number, complete: boolean
     prisma.task.updateMany({
       where: { parentId: taskId },
       data: { completed: complete },
+    }),
+    // This ensures the collection stats are recalculated
+    prisma.collection.update({
+      where: { id: task.collectionId },
+      data: { updatedAt: new Date() }, // Just touch the collection
     }),
   ]);
 };
@@ -42,10 +55,20 @@ export const updateTask = async (id: number, updates: Partial<Task>): Promise<Ta
 
 // Delete a Task and its subtasks
 export const deleteTaskWithSubtasks = async (id: number): Promise<void> => {
-  // Delete subtasks first, then delete the parent
+  const task = await prisma.task.findUnique({
+    where: { id },
+    select: { collectionId: true },
+  });
+
+  if (!task) throw new Error('Task not found');
+
   await prisma.$transaction([
     prisma.task.deleteMany({ where: { parentId: id } }),
     prisma.task.delete({ where: { id } }),
+    prisma.collection.update({
+      where: { id: task.collectionId },
+      data: { updatedAt: new Date() },
+    }),
   ]);
 };
 

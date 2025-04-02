@@ -34,13 +34,16 @@ export const api = createApi({
       invalidatesTags: (result, error, arg) =>
         arg.collectionId ? [{ type: 'Task', id: arg.collectionId }] : [],
     }),
+    // Example for completeTask mutation
     completeTask: builder.mutation<Task, number>({
       query: (id) => ({
         url: `tasks/${id}/complete`,
         method: 'PATCH',
       }),
-      invalidatesTags: (result) =>
-        result?.collectionId ? [{ type: 'Task', id: result.collectionId }] : [],
+      invalidatesTags: (result) => [
+        { type: 'Task', id: result?.collectionId },
+        { type: 'Collection', id: result?.collectionId },
+      ],
     }),
     updateTask: builder.mutation<Task, Partial<Task>>({
       query: (updatedTask) => {
@@ -77,6 +80,18 @@ export const api = createApi({
       invalidatesTags: (result) =>
         result?.collectionId ? [{ type: 'Task', id: result.collectionId }] : [],
     }),
+    // In your api.ts file, add these endpoints
+    getCollectionStats: builder.query<{ taskCount: number; completedCount: number }, number>({
+      query: (collectionId) => `collections/${collectionId}/stats`,
+      providesTags: (result, error, arg) => [{ type: 'Collection', id: arg }],
+    }),
+    updateCollectionStats: builder.mutation<void, number>({
+      query: (collectionId) => ({
+        url: `collections/${collectionId}/stats`,
+        method: 'PUT',
+      }),
+      invalidatesTags: (result, error, arg) => [{ type: 'Collection', id: arg }],
+    }),
   }),
 });
 
@@ -89,4 +104,5 @@ export const {
   useUpdateTaskMutation,
   useDeleteTaskMutation,
   useCompleteTaskWithSubtasksMutation,
+  useGetCollectionStatsQuery,
 } = api;
