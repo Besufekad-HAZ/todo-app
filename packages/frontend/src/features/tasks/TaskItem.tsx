@@ -14,11 +14,13 @@ export function TaskItem({
   depth = 0,
   onTaskUpdated,
   dragHandleProps,
+  isDragging,
 }: {
   task: Task;
   depth?: number;
   onTaskUpdated?: () => void;
   dragHandleProps?: any;
+  isDragging?: boolean;
 }) {
   const [isExpanded, setIsExpanded] = useState(task.isExpanded ?? true);
   const [isEditing, setIsEditing] = useState(false);
@@ -128,10 +130,10 @@ export function TaskItem({
     <div
       className={`group relative py-3 px-4 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors duration-200 ${
         depth > 0 ? 'border-l-2 border-gray-700 ml-3' : ''
-      }`}
+      } ${isDragging ? 'shadow-lg ring-2 ring-pink-500 ring-opacity-50' : ''}`}
       style={{ paddingLeft: depth ? `${depth * 12 + 16}px` : '16px' }}
     >
-      {/* Edit Mode */}
+      {/* Drag Handle */}
       {isEditing ? (
         <form onSubmit={handleEditSubmit} className="flex items-center gap-2">
           <input
@@ -185,6 +187,27 @@ export function TaskItem({
       ) : (
         /* View Mode */
         <div className="flex items-start gap-3">
+          {/* Drag handle for reordering */}
+          <div
+            {...dragHandleProps}
+            className="touch-none flex items-center cursor-grab active:cursor-grabbing text-gray-500 hover:text-gray-300 -ml-1.5 mr-0.5"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5"
+              />
+            </svg>
+          </div>
+
           {/* Completion checkbox */}
           <button
             onClick={handleComplete}

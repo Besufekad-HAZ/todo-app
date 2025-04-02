@@ -1,11 +1,5 @@
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
+// src/features/tasks/SortableSubtasksList.tsx
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { SortableTaskItem } from './SortableTaskItem';
 import { Task } from '../../types/types';
@@ -25,42 +19,41 @@ export function SortableSubtasksList({
 }: SortableSubtasksListProps) {
   const [updateTask] = useUpdateTaskMutation();
   const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // Minimum drag distance before activation
+      },
     }),
   );
 
   const handleDragEnd = async (event: any) => {
     const { active, over } = event;
 
-    if (active.id !== over.id) {
-      // Find the indexes
-      const oldIndex = subtasks.findIndex((task) => task.id === active.id);
-      const newIndex = subtasks.findIndex((task) => task.id === over.id);
+    if (!over || active.id === over.id) {
+      return;
+    }
 
-      if (oldIndex !== -1 && newIndex !== -1) {
-        // Create a new array with the updated order
-        const updatedSubtasks = arrayMove(subtasks, oldIndex, newIndex);
+    // Find the indexes
+    const oldIndex = subtasks.findIndex((task) => task.id === active.id);
+    const newIndex = subtasks.findIndex((task) => task.id === over.id);
 
-        // Update all affected tasks in the database
-        try {
-          const updatePromises = updatedSubtasks.map((task, index) => {
-            // Only update if the position changed
-            if (task.order !== index) {
-              return updateTask({
-                id: task.id,
-                order: index,
-              }).unwrap();
-            }
-            return Promise.resolve();
-          });
+    if (oldIndex !== -1 && newIndex !== -1) {
+      // Create a new array with the updated order
+      const updatedSubtasks = arrayMove(subtasks, oldIndex, newIndex);
 
-          await Promise.all(updatePromises);
-          onTaskUpdated?.();
-        } catch (error) {
-          console.error('Failed to update task order:', error);
-        }
+      // Update all affected tasks in the database
+      try {
+        const updatePromises = updatedSubtasks.map((task, index) => {
+          return updateTask({
+            id: task.id,
+            order: index,
+          }).unwrap();
+        });
+
+        await Promise.all(updatePromises);
+        onTaskUpdated?.();
+      } catch (error) {
+        console.error('Failed to update task order:', error);
       }
     }
   };
@@ -71,7 +64,7 @@ export function SortableSubtasksList({
         items={subtasks.map((task) => task.id)}
         strategy={verticalListSortingStrategy}
       >
-        <div className="mt-1 space-y-1">
+        <div className="mt-2 space-y-2 pl-3 border-l border-gray-700">
           {subtasks.map((subtask) => (
             <SortableTaskItem
               key={subtask.id}
@@ -84,33 +77,4 @@ export function SortableSubtasksList({
       </SortableContext>
     </DndContext>
   );
-}
-
-function sortableKeyboardCoordinates(e: any) {
-  const { currentCoordinates } = e;
-
-  switch (e.key) {
-    case 'ArrowLeft':
-      return {
-        ...currentCoordinates,
-        x: currentCoordinates.x - 10,
-      };
-    case 'ArrowRight':
-      return {
-        ...currentCoordinates,
-        x: currentCoordinates.x + 10,
-      };
-    case 'ArrowDown':
-      return {
-        ...currentCoordinates,
-        y: currentCoordinates.y + 10,
-      };
-    case 'ArrowUp':
-      return {
-        ...currentCoordinates,
-        y: currentCoordinates.y - 10,
-      };
-    default:
-      return currentCoordinates;
-  }
 }

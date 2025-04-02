@@ -1,12 +1,36 @@
 // src/features/tasks/TaskList.tsx
-import { useGetTasksByCollectionQuery } from '../../services/api';
+import { useState } from 'react';
+import { useGetTasksByCollectionQuery, useUpdateTaskMutation } from '../../services/api';
 import { TaskItem } from './TaskItem';
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { Task } from '../../types/types';
+import {
+  DndContext,
+  closestCenter,
+  DragEndEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
+import { SortableTaskItem } from './SortableTaskItem';
 
 export function TaskList({ collectionId }: { collectionId: number }) {
   const { data: tasks, isLoading, error, refetch } = useGetTasksByCollectionQuery(collectionId);
+  const [updateTask] = useUpdateTaskMutation();
+  const [expandedSection, setExpandedSection] = useState<'incomplete' | 'completed' | 'both'>(
+    'both',
+  );
+
+  // Configure sensors for drag and drop
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // Minimum drag distance before activation
+      },
+    }),
+  );
 
   if (isLoading) {
     return (
@@ -44,26 +68,97 @@ export function TaskList({ collectionId }: { collectionId: number }) {
   const incompleteTasks = tasks.filter((task) => !task.completed && !task.parentId);
   const completedTasks = tasks.filter((task) => task.completed && !task.parentId);
 
+  // Handle drag end for incomplete tasks
+  const handleDragEnd = async (event: DragEndEvent, taskGroup: Task[]) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) {
+      return;
+    }
+
+    const oldIndex = taskGroup.findIndex((task) => task.id === active.id);
+    const newIndex = taskGroup.findIndex((task) => task.id === over.id);
+
+    if (oldIndex !== -1 && newIndex !== -1) {
+      const newOrder = arrayMove(taskGroup, oldIndex, newIndex);
+
+      // Update the database with the new order
+      try {
+        const updatePromises = newOrder.map((task, index) => {
+          return updateTask({
+            id: task.id,
+            order: index,
+          }).unwrap();
+        });
+
+        await Promise.all(updatePromises);
+        refetch(); // Refresh the task list after reordering
+      } catch (error) {
+        console.error('Failed to update task order:', error);
+      }
+    }
+  };
+
+  // Toggle task section expansion
+  const toggleSection = (section: 'incomplete' | 'completed') => {
+    if (expandedSection === section) {
+      setExpandedSection('both');
+    } else {
+      setExpandedSection(section);
+    }
+  };
+
   return (
     <div className="flex-1 overflow-y-auto p-4">
       {/* Active Tasks Section */}
       <div className="mb-8">
-        <h3 className="text-sm font-medium text-gray-400 mb-4">Tasks - {incompleteTasks.length}</h3>
-        <div className="space-y-2">
-          {incompleteTasks.map((task) => (
-            <TaskItem key={task.id} task={task} onTaskUpdated={refetch} />
-          ))}
-        </div>
+        <h3
+          className="text-sm font-medium text-gray-400 mb-4 flex items-center cursor-pointer hover:text-white"
+          onClick={() => toggleSection('incomplete')}
+        >
+          Tasks - {incompleteTasks.length}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className={`h-4 w-4 ml-1 transition-transform ${expandedSection === 'incomplete' ? 'transform rotate-180' : ''}`}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </h3>
+
+        {(expandedSection === 'both' || expandedSection === 'incomplete') && (
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={(event) => handleDragEnd(event, incompleteTasks)}
+          >
+            <SortableContext
+              items={incompleteTasks.map((task) => task.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="space-y-2">
+                {incompleteTasks.map((task) => (
+                  <SortableTaskItem key={task.id} task={task} onTaskUpdated={refetch} />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        )}
       </div>
 
       {/* Completed Tasks Section */}
       {completedTasks.length > 0 && (
         <div>
-          <h3 className="text-sm font-medium text-gray-400 mb-4 flex items-center">
+          <h3
+            className="text-sm font-medium text-gray-400 mb-4 flex items-center cursor-pointer hover:text-white"
+            onClick={() => toggleSection('completed')}
+          >
             Completed - {completedTasks.length}
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4 ml-1"
+              className={`h-4 w-4 ml-1 transition-transform ${expandedSection === 'completed' ? 'transform rotate-180' : ''}`}
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -76,11 +171,25 @@ export function TaskList({ collectionId }: { collectionId: number }) {
               />
             </svg>
           </h3>
-          <div className="space-y-2">
-            {completedTasks.map((task) => (
-              <TaskItem key={task.id} task={task} onTaskUpdated={refetch} />
-            ))}
-          </div>
+
+          {(expandedSection === 'both' || expandedSection === 'completed') && (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={(event) => handleDragEnd(event, completedTasks)}
+            >
+              <SortableContext
+                items={completedTasks.map((task) => task.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="space-y-2">
+                  {completedTasks.map((task) => (
+                    <SortableTaskItem key={task.id} task={task} onTaskUpdated={refetch} />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
+          )}
         </div>
       )}
     </div>

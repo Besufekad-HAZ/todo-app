@@ -6,7 +6,7 @@ import { Task } from '../../types/types';
 
 export function SortableTaskItem({
   task,
-  depth,
+  depth = 0,
   onTaskUpdated,
 }: {
   task: Task;
@@ -21,16 +21,23 @@ export function SortableTaskItem({
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-    zIndex: isDragging ? 1 : 0,
+    zIndex: isDragging ? 1000 : 1,
+    position: 'relative' as const,
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes}>
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={isDragging ? 'relative z-10' : ''}
+      {...attributes}
+    >
       <TaskItem
         task={task}
         depth={depth}
         onTaskUpdated={onTaskUpdated}
         dragHandleProps={listeners}
+        isDragging={isDragging}
       />
     </div>
   );
