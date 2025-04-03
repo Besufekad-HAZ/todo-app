@@ -21,7 +21,7 @@ export function SortableTaskItem({
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-    zIndex: isDragging ? 1000 : 1,
+    zIndex: isDragging ? 1000 : 'auto', // Changed from 1 to 'auto'
     position: 'relative' as const,
   };
 

@@ -235,6 +235,27 @@
     background-color: rgb(var(--color-primary)) !important;
     color: white !important;
   }
+
+  /* .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-content {
+    position: relative;
+    background: rgb(var(--color-card-bg));
+    border-radius: 0.5rem;
+    border: 1px solid rgb(var(--color-card-border));
+    max-width: 95%;
+    width: 400px;
+    padding: 1.5rem;
+  } */
 }
 
 

@@ -27,7 +27,7 @@ export function CollectionsPage() {
 
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-semibold">Collections</h1>
+          {/* <h1 className="text-2xl font-semibold">Collections</h1> */}
           <button
             onClick={() => setIsMobileMenuOpen(true)}
             className="md:hidden text-text-muted hover:text-primary"
