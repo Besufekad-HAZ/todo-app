@@ -97,7 +97,7 @@ export function TaskList({ collectionId }: { collectionId: number }) {
       <div className="mb-8">
         <h3
           className="text-sm font-medium mb-4 flex items-center cursor-pointer"
-          onClick={() => setIncompleteExpanded(prev => !prev)}
+          onClick={() => setIncompleteExpanded((prev) => !prev)}
           style={{ color: 'rgb(var(--color-text-muted))' }}
         >
           Tasks - {incompleteTasks.length}
@@ -136,7 +136,7 @@ export function TaskList({ collectionId }: { collectionId: number }) {
         <div>
           <h3
             className="text-sm font-medium mb-4 flex items-center cursor-pointer"
-            onClick={() => setCompletedExpanded(prev => !prev)}
+            onClick={() => setCompletedExpanded((prev) => !prev)}
             style={{ color: 'rgb(var(--color-text-muted))' }}
           >
             Completed - {completedTasks.length}
@@ -147,7 +147,12 @@ export function TaskList({ collectionId }: { collectionId: number }) {
               viewBox="0 0 24 24"
               stroke="currentColor"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
             </svg>
           </h3>
           {completedExpanded && (

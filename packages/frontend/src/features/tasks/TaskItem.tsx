@@ -7,7 +7,8 @@ import {
 } from '../../services/api';
 import { toast } from 'react-toastify';
 import { SortableSubtasksList } from './SortableSubtaskList';
-import { TaskForm } from './TaskForm';
+// import { TaskForm } from './TaskForm';
+import { SimpleSubtaskForm } from './SimpleSubtaskForm';
 
 export function TaskItem({
   task,
@@ -26,7 +27,8 @@ export function TaskItem({
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(task.title);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [showAddSubtaskForm, setShowAddSubtaskForm] = useState(false);
+  // const [showAddSubtaskForm, setShowAddSubtaskForm] = useState(false);
+  const [showSimpleSubtaskForm, setShowSimpleSubtaskForm] = useState(false);
 
   const [completeTask] = useCompleteTaskWithSubtasksMutation();
   const [deleteTask] = useDeleteTaskMutation();
@@ -346,7 +348,7 @@ export function TaskItem({
               </button>
               {depth === 0 && (
                 <button
-                  onClick={() => setShowAddSubtaskForm(true)}
+                  onClick={() => setShowSimpleSubtaskForm(true)}
                   className="p-1 hover:text-green-400"
                   style={{ color: 'rgb(var(--color-text-muted))' }}
                   title="Add Subtask"
@@ -412,11 +414,15 @@ export function TaskItem({
       )}
 
       {/* Add Subtask Form */}
-      {showAddSubtaskForm && (
-        <TaskForm
-          collectionId={task.collectionId}
+      {showSimpleSubtaskForm && (
+        <SimpleSubtaskForm
           parentId={task.id}
-          onClose={() => setShowAddSubtaskForm(false)}
+          collectionId={task.collectionId}
+          onSuccess={() => {
+            setShowSimpleSubtaskForm(false);
+            onTaskUpdated?.();
+          }}
+          onCancel={() => setShowSimpleSubtaskForm(false)}
         />
       )}
 

@@ -223,7 +223,10 @@ export function CollectionsGrid({ onSelect }: CollectionsGridProps) {
   return (
     <div className="w-full">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: 'rgb(var(--color-text-base))' }}>
+        <h1
+          className="text-2xl sm:text-3xl font-bold"
+          style={{ color: 'rgb(var(--color-text-base))' }}
+        >
           Collections
         </h1>
         <div className="flex space-x-2">

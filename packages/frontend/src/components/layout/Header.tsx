@@ -5,6 +5,7 @@ import { ThemeToggle } from '../ThemeToogle';
 
 interface HeaderProps {
   onMenuToggle: () => void;
+  mobileSidebarOpen: boolean;
 }
 
 export function Header({ onMenuToggle }: HeaderProps) {

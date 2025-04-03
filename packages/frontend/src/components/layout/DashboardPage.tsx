@@ -1,76 +1,18 @@
+import { useNavigate, useParams } from 'react-router-dom';
+import { CollectionList } from '../../features/collections/CollectionList';
+import { TaskForm } from '../../features/tasks/TaskForm';
+import { TaskList } from '../../features/tasks/TaskList';
+import { EmptyState } from '../ui/EmptyState';
+import { MobileSidebar } from './MobileSidebar';
+// import { Header } from './Header';
 import { useState } from 'react';
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-  useParams,
-  useNavigate,
-} from 'react-router-dom';
-import { CollectionList } from './features/collections/CollectionList';
-import { TaskList } from './features/tasks/TaskList';
-import { TaskForm } from './features/tasks/TaskForm';
-import { Toaster } from './components/ui/Toaster';
-import { Header } from './components/layout/Header';
-import { MobileSidebar } from './components/layout/MobileSidebar';
-import { EmptyState } from './components/ui/EmptyState';
-import { CollectionsPage } from './features/collections/CollectionsPage';
 
-export function App() {
-  const [showTaskForm, setShowTaskForm] = useState(false);
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-
-  return (
-    <Router>
-      <div className="min-h-screen flex flex-col">
-        <Header
-          onMenuToggle={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-          mobileSidebarOpen={mobileSidebarOpen}
-        />
-        <Routes>
-          <Route path="/" element={<Navigate to="/collections" replace />} />
-          <Route
-            path="/collections"
-            element={
-              <CollectionsPage
-                mobileSidebarOpen={mobileSidebarOpen}
-                setMobileSidebarOpen={setMobileSidebarOpen}
-              />
-            }
-          />
-          <Route
-            path="/dashboard/:collectionId?"
-            element={
-              <DashboardPage
-                showTaskForm={showTaskForm}
-                setShowTaskForm={setShowTaskForm}
-                mobileSidebarOpen={mobileSidebarOpen}
-                setMobileSidebarOpen={setMobileSidebarOpen}
-              />
-            }
-          />
-        </Routes>
-        <Toaster />
-      </div>
-    </Router>
-  );
-}
-
-// Dashboard page component
-function DashboardPage({
-  showTaskForm,
-  setShowTaskForm,
-  mobileSidebarOpen,
-  setMobileSidebarOpen,
-}: {
-  showTaskForm: boolean;
-  setShowTaskForm: (show: boolean) => void;
-  mobileSidebarOpen: boolean;
-  setMobileSidebarOpen: (open: boolean) => void;
-}) {
+export function DashboardPage() {
   const { collectionId } = useParams<{ collectionId?: string }>();
   const navigate = useNavigate();
   const selectedCollectionId = collectionId ? parseInt(collectionId) : null;
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [showTaskForm, setShowTaskForm] = useState(false);
 
   return (
     <div className="flex flex-1 overflow-hidden">
@@ -92,8 +34,15 @@ function DashboardPage({
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col overflow-hidden">
+        {/* Add Header here */}
+        {/* <Header
+          onMenuToggle={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+          mobileSidebarOpen={mobileSidebarOpen}
+        /> */}
+
         {selectedCollectionId ? (
-          <>
+          <div className="flex-1 overflow-auto">
+            {/* Collection-specific header */}
             <div
               className="p-4 border-b flex justify-between items-center"
               style={{ borderColor: 'rgb(var(--color-border))' }}
@@ -148,8 +97,9 @@ function DashboardPage({
                 <span className="text-sm">Add a task</span>
               </button>
             </div>
+
             <TaskList collectionId={selectedCollectionId} />
-          </>
+          </div>
         ) : (
           <EmptyState
             icon="collection"
@@ -165,5 +115,3 @@ function DashboardPage({
     </div>
   );
 }
-
-export default App;

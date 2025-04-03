@@ -3,7 +3,7 @@
 
 @theme {
   /* Define custom colors specific to our app */
-  --color-primary: #FF007F;
+  --color-primary: #ff007f;
   --color-primary-hover: oklch(0.52 0.24 327); /* Pink-600 */
   --color-secondary: oklch(0.62 0.21 260); /* Blue-500 */
   --color-secondary-hover: oklch(0.55 0.25 263); /* Blue-600 */
@@ -257,7 +257,6 @@
     padding: 1.5rem;
   } */
 }
-
 
 @layer utilities {
   .bg-primary\/20 {
