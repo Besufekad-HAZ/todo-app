@@ -1,4 +1,3 @@
-//// filepath: /home/bese/All projects/todo-app/packages/frontend/src/services/api.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { Collection, Task } from '../types/types';
 

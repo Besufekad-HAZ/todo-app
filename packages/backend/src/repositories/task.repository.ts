@@ -16,7 +16,7 @@ export const createTask = async (taskData: {
 export const completeTaskWithSubtasks = async (taskId: number, complete: boolean) => {
   const task = await prisma.task.findUnique({
     where: { id: taskId },
-    select: { collectionId: true }
+    select: { collectionId: true },
   });
 
   if (!task) throw new Error('Task not found');
@@ -24,12 +24,12 @@ export const completeTaskWithSubtasks = async (taskId: number, complete: boolean
   await prisma.$transaction([
     prisma.task.update({
       where: { id: taskId },
-      data: { completed: complete }
+      data: { completed: complete },
     }),
     prisma.task.updateMany({
       where: { parentId: taskId },
-      data: { completed: complete }
-    })
+      data: { completed: complete },
+    }),
   ]);
 
   // Force invalidate the cache
