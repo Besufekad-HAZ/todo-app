@@ -19,7 +19,7 @@ export function TaskItem({
   task: Task;
   depth?: number;
   onTaskUpdated?: () => void;
-  dragHandleProps?: any;
+  dragHandleProps?: unknown;
   isDragging?: boolean;
 }) {
   const [isExpanded, setIsExpanded] = useState(task.isExpanded ?? true);
@@ -128,10 +128,17 @@ export function TaskItem({
 
   return (
     <div
-      className={`group relative py-3 px-4 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors duration-200 ${
-        depth > 0 ? 'border-l-2 border-gray-700 ml-3' : ''
-      } ${isDragging ? 'shadow-lg ring-2 ring-pink-500 ring-opacity-50' : ''}`}
-      style={{ paddingLeft: depth ? `${depth * 12 + 16}px` : '16px' }}
+      className={`group relative py-3 px-4 rounded-lg transition-colors duration-200 ${
+        depth > 0 ? 'ml-3' : ''
+      } ${isDragging ? 'shadow-lg ring-2 ring-primary ring-opacity-50' : ''}`}
+      style={{
+        backgroundColor: 'rgb(var(--color-card-bg))',
+        borderLeft: depth > 0 ? `2px solid rgb(var(--color-border))` : undefined,
+        paddingLeft: depth ? `${depth * 12 + 16}px` : '16px',
+        ':hover': {
+          backgroundColor: 'rgb(var(--color-card-hover))',
+        },
+      }}
     >
       {/* Drag Handle */}
       {isEditing ? (
@@ -141,7 +148,12 @@ export function TaskItem({
             value={editTitle}
             onChange={(e) => setEditTitle(e.target.value)}
             autoFocus
-            className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:ring-pink-500 focus:border-pink-500 text-white text-sm"
+            className="flex-1 px-3 py-2 rounded-md focus:ring-primary focus:border-primary text-sm"
+            style={{
+              backgroundColor: 'rgb(var(--color-input-bg))',
+              borderColor: 'rgb(var(--color-input-border))',
+              color: 'rgb(var(--color-text-base))',
+            }}
             onBlur={() => setIsEditing(false)}
           />
           <div className="flex gap-1">
@@ -166,7 +178,8 @@ export function TaskItem({
             <button
               type="button"
               onClick={() => setIsEditing(false)}
-              className="p-1.5 text-gray-400 hover:bg-gray-600 rounded-full"
+              className="p-1.5 rounded-full"
+              style={{ color: 'rgb(var(--color-text-muted))' }}
               title="Cancel"
             >
               <svg
@@ -190,7 +203,8 @@ export function TaskItem({
           {/* Drag handle for reordering */}
           <div
             {...dragHandleProps}
-            className="touch-none flex items-center cursor-grab active:cursor-grabbing text-gray-500 hover:text-gray-300 -ml-1.5 mr-0.5"
+            className="touch-none flex items-center cursor-grab active:cursor-grabbing -ml-1.5 mr-0.5"
+            style={{ color: 'rgb(var(--color-text-muted))' }}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -212,10 +226,11 @@ export function TaskItem({
           <button
             onClick={handleComplete}
             className={`mt-0.5 flex-shrink-0 h-5 w-5 rounded-full border flex items-center justify-center transition-colors ${
-              task.completed
-                ? 'bg-pink-500 border-pink-500 text-white'
-                : 'border-gray-500 hover:border-pink-300'
+              task.completed ? 'bg-primary border-primary text-white' : 'hover:border-primary-hover'
             }`}
+            style={{
+              borderColor: task.completed ? undefined : 'rgb(var(--color-border))',
+            }}
             aria-label={task.completed ? 'Mark incomplete' : 'Mark complete'}
           >
             {task.completed && (
@@ -233,7 +248,12 @@ export function TaskItem({
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between">
               <span
-                className={`flex-1 text-white ${task.completed ? 'line-through text-gray-400' : ''}`}
+                className={`flex-1 ${task.completed ? 'line-through' : ''}`}
+                style={{
+                  color: task.completed
+                    ? 'rgb(var(--color-text-muted))'
+                    : 'rgb(var(--color-text-base))',
+                }}
                 onDoubleClick={() => setIsEditing(true)}
               >
                 {task.title}
@@ -269,10 +289,17 @@ export function TaskItem({
             </div>
 
             {/* Action Buttons */}
-            <div className="absolute right-3 top-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-700 px-2 py-1 rounded-md shadow-sm border border-gray-600">
+            <div
+              className="absolute right-3 top-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 rounded-md shadow-sm border"
+              style={{
+                backgroundColor: 'rgb(var(--color-card-bg))',
+                borderColor: 'rgb(var(--color-card-border))',
+              }}
+            >
               <button
                 onClick={() => setIsEditing(true)}
-                className="text-gray-400 hover:text-white p-1"
+                className="p-1 hover:text-white"
+                style={{ color: 'rgb(var(--color-text-muted))' }}
                 title="Edit"
               >
                 <svg
@@ -286,7 +313,8 @@ export function TaskItem({
               </button>
               <button
                 onClick={() => setShowDeleteConfirm(true)}
-                className="text-gray-400 hover:text-red-400 p-1"
+                className="p-1 hover:text-red-400"
+                style={{ color: 'rgb(var(--color-text-muted))' }}
                 title="Delete"
               >
                 <svg
@@ -305,7 +333,8 @@ export function TaskItem({
               {depth === 0 && (
                 <button
                   onClick={() => setShowAddSubtaskForm(true)}
-                  className="text-gray-400 hover:text-green-400 p-1"
+                  className="p-1 hover:text-green-400"
+                  style={{ color: 'rgb(var(--color-text-muted))' }}
                   title="Add Subtask"
                 >
                   <svg
@@ -330,15 +359,30 @@ export function TaskItem({
       {/* Delete Confirmation Dialog */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
-          <div className="bg-gray-800 p-6 rounded-lg shadow-xl max-w-sm w-full mx-4 border border-gray-700">
-            <h3 className="text-lg font-medium text-white mb-4">Delete Task</h3>
-            <p className="text-sm text-gray-300 mb-6">
+          <div
+            className="p-6 rounded-lg shadow-xl max-w-sm w-full mx-4 border"
+            style={{
+              backgroundColor: 'rgb(var(--color-card-bg))',
+              borderColor: 'rgb(var(--color-card-border))',
+            }}
+          >
+            <h3
+              className="text-lg font-medium mb-4"
+              style={{ color: 'rgb(var(--color-text-base))' }}
+            >
+              Delete Task
+            </h3>
+            <p className="text-sm mb-6" style={{ color: 'rgb(var(--color-text-muted))' }}>
               Are you sure you want to delete this task and all its subtasks?
             </p>
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 rounded-md border border-gray-600"
+                className="px-4 py-2 text-sm font-medium rounded-md border"
+                style={{
+                  color: 'rgb(var(--color-text-muted))',
+                  borderColor: 'rgb(var(--color-border))',
+                }}
               >
                 Cancel
               </button>

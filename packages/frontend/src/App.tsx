@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   BrowserRouter as Router,
   Routes,
@@ -19,42 +19,12 @@ import { CollectionsPage } from './features/collections/CollectionsPage';
 export function App() {
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(true); // Default to dark mode
-
-  useEffect(() => {
-    // Check for saved theme preference or system preference
-    const savedTheme = localStorage.getItem('theme');
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-    if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
-      document.documentElement.classList.add('dark');
-      setIsDarkMode(true);
-    } else {
-      document.documentElement.classList.remove('dark');
-      setIsDarkMode(false);
-    }
-  }, []);
-
-  const handleThemeChange = (darkMode: boolean) => {
-    setIsDarkMode(darkMode);
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-  };
 
   return (
     <Router>
-      <div className={`min-h-screen flex flex-col ${isDarkMode ? 'dark' : ''}`}>
-        <div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col transition-colors duration-200">
-          <Header
-            onMenuToggle={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-            isDarkMode={isDarkMode}
-            onThemeToggle={handleThemeChange}
-          />
+      <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen flex flex-col transition-colors duration-200">
+          <Header onMenuToggle={() => setMobileSidebarOpen(!mobileSidebarOpen)} />
 
           <Routes>
             <Route path="/" element={<Navigate to="/collections" replace />} />
@@ -114,14 +84,18 @@ function DashboardPage({
       </MobileSidebar>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col overflow-hidden bg-gray-900 text-white">
+      <main className="flex-1 flex flex-col overflow-hidden">
         {selectedCollectionId ? (
           <>
-            <div className="p-4 border-b border-gray-700 flex justify-between items-center">
+            <div
+              className="p-4 border-b flex justify-between items-center"
+              style={{ borderColor: 'rgb(var(--color-border))' }}
+            >
               <div className="flex items-center">
                 <button
-                  className="mr-2 text-gray-400 hover:text-gray-300"
+                  className="mr-2 hover:text-gray-600 dark:hover:text-gray-300"
                   onClick={() => navigate('/collections')}
+                  style={{ color: 'rgb(var(--color-text-muted))' }}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -136,8 +110,8 @@ function DashboardPage({
                     />
                   </svg>
                 </button>
-                <h2 className="text-xl font-semibold text-white">School</h2>
-                <button className="ml-2 text-gray-400">
+                <h2 className="text-xl font-semibold">School</h2>
+                <button className="ml-2" style={{ color: 'rgb(var(--color-text-muted))' }}>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-5 w-5"
@@ -150,7 +124,7 @@ function DashboardPage({
               </div>
               <button
                 onClick={() => setShowTaskForm(true)}
-                className="flex items-center px-3 py-1.5 bg-pink-500 text-white rounded-md shadow-sm transition-colors hover:bg-pink-600"
+                className="flex items-center px-3 py-1.5 bg-primary text-white rounded-md shadow-sm transition-colors hover:bg-primary-hover"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

@@ -143,7 +143,13 @@ export function TaskForm({
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-800 rounded-lg shadow-xl w-full max-w-md overflow-hidden border border-gray-700">
+      <div
+        className="rounded-lg shadow-xl w-full max-w-md overflow-hidden border"
+        style={{
+          backgroundColor: 'rgb(var(--color-card-bg))',
+          borderColor: 'rgb(var(--color-card-border))',
+        }}
+      >
         <form onSubmit={handleSubmit} className="overflow-y-auto">
           <div className="p-4">
             <input
@@ -151,7 +157,12 @@ export function TaskForm({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Task title"
-              className="w-full px-3 py-3 bg-gray-700 border border-gray-600 rounded-md focus:ring-pink-500 focus:border-pink-500 text-white text-base mb-4"
+              className="w-full px-3 py-3 rounded-md text-base mb-4"
+              style={{
+                backgroundColor: 'rgb(var(--color-input-bg))',
+                borderColor: 'rgb(var(--color-input-border))',
+                color: 'rgb(var(--color-text-base))',
+              }}
               required
               autoFocus
             />
@@ -173,7 +184,13 @@ export function TaskForm({
 
                 {/* Collection Dropdown */}
                 {showCollectionDropdown && (
-                  <div className="absolute top-full left-0 mt-1 bg-gray-800 border border-gray-700 rounded-md shadow-lg z-10 w-40">
+                  <div
+                    className="absolute top-full left-0 mt-1 rounded-md shadow-lg z-10 w-40 border"
+                    style={{
+                      backgroundColor: 'rgb(var(--color-card-bg))',
+                      borderColor: 'rgb(var(--color-card-border))',
+                    }}
+                  >
                     {collections.map((collection) => (
                       <button
                         key={collection.id}
@@ -181,6 +198,11 @@ export function TaskForm({
                         className={`flex items-center gap-2 w-full px-3 py-2 text-left hover:bg-gray-700 ${
                           collection.id === selectedCollectionId ? 'bg-gray-700' : ''
                         }`}
+                        style={{
+                          ':hover': {
+                            backgroundColor: 'rgb(var(--color-card-hover))',
+                          },
+                        }}
                         onClick={() => {
                           setSelectedCollectionId(collection.id);
                           setShowCollectionDropdown(false);
@@ -189,7 +211,9 @@ export function TaskForm({
                         <span
                           className={`w-3 h-3 rounded-sm ${getCollectionColor(collection.name)}`}
                         ></span>
-                        <span className="text-white text-sm">{collection.name}</span>
+                        <span style={{ color: 'rgb(var(--color-text-base))' }} className="text-sm">
+                          {collection.name}
+                        </span>
                       </button>
                     ))}
                   </div>
@@ -202,8 +226,13 @@ export function TaskForm({
                 className={`px-3 py-1.5 rounded-md text-sm ${
                   selectedTags.includes('Today')
                     ? 'bg-green-500 text-white'
-                    : 'bg-gray-700 text-green-400 hover:bg-gray-600'
+                    : 'text-green-400 hover:bg-gray-600'
                 }`}
+                style={{
+                  backgroundColor: selectedTags.includes('Today')
+                    ? undefined
+                    : 'rgb(var(--color-card-bg))',
+                }}
                 onClick={() => toggleTag('Today')}
               >
                 Today
@@ -215,8 +244,13 @@ export function TaskForm({
                 className={`px-3 py-1.5 rounded-md text-sm flex items-center ${
                   selectedTags.includes('Flag')
                     ? 'bg-red-500 text-white'
-                    : 'bg-gray-700 text-red-400 hover:bg-gray-600'
+                    : 'text-red-400 hover:bg-gray-600'
                 }`}
+                style={{
+                  backgroundColor: selectedTags.includes('Flag')
+                    ? undefined
+                    : 'rgb(var(--color-card-bg))',
+                }}
                 onClick={() => toggleTag('Flag')}
               >
                 <FaFlag className="mr-1" />
@@ -265,11 +299,13 @@ export function TaskForm({
             {/* Subtasks Section */}
             <div className="mb-4">
               <div className="flex justify-between items-center mb-2">
-                <label className="text-sm text-gray-300">Subtasks</label>
+                <label className="text-sm" style={{ color: 'rgb(var(--color-text-muted))' }}>
+                  Subtasks
+                </label>
                 <button
                   type="button"
                   onClick={addSubtask}
-                  className="text-xs text-pink-500 hover:text-pink-400 flex items-center"
+                  className="text-xs text-primary hover:text-primary-hover flex items-center"
                 >
                   <FaPlus className="mr-1" /> Add Subtask
                 </button>
@@ -282,13 +318,19 @@ export function TaskForm({
                     value={subtask.title}
                     onChange={(e) => updateSubtask(index, e.target.value)}
                     placeholder={`Subtask ${index + 1}`}
-                    className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:ring-pink-500 focus:border-pink-500 text-white text-sm"
+                    className="flex-1 px-3 py-2 rounded-md focus:ring-primary focus:border-primary text-sm"
+                    style={{
+                      backgroundColor: 'rgb(var(--color-input-bg))',
+                      borderColor: 'rgb(var(--color-input-border))',
+                      color: 'rgb(var(--color-text-base))',
+                    }}
                   />
                   {subtasks.length > 1 && (
                     <button
                       type="button"
                       onClick={() => removeSubtask(index)}
-                      className="ml-2 text-gray-400 hover:text-red-400 p-1"
+                      className="ml-2 hover:text-red-400 p-1"
+                      style={{ color: 'rgb(var(--color-text-muted))' }}
                     >
                       <FaMinus />
                     </button>
@@ -301,14 +343,20 @@ export function TaskForm({
           <div className="flex">
             <button
               type="submit"
-              className="flex-1 py-3 font-medium text-white bg-pink-500 hover:bg-pink-600 transition-colors"
+              className="flex-1 py-3 font-medium text-white bg-primary hover:bg-primary-hover transition-colors"
             >
               {parentId ? 'Add Subtask' : 'Add Task'}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-3 font-medium text-gray-300 hover:bg-gray-700 transition-colors"
+              className="flex-1 py-3 font-medium transition-colors"
+              style={{
+                color: 'rgb(var(--color-text-muted))',
+                ':hover': {
+                  backgroundColor: 'rgb(var(--color-card-hover))',
+                },
+              }}
             >
               Cancel
             </button>

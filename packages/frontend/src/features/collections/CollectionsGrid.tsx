@@ -114,7 +114,7 @@ function CollectionCard({ collection, onSelect, onToggleFavorite }: CollectionCa
             cx="20"
             cy="20"
             r={radius}
-            className="stroke-gray-700"
+            className="dark:stroke-gray-700 stroke-gray-200"
             strokeWidth="4"
             fill="transparent"
           />
@@ -131,7 +131,10 @@ function CollectionCard({ collection, onSelect, onToggleFavorite }: CollectionCa
             transform="rotate(-90 20 20)"
           />
         </svg>
-        <span className="absolute text-white text-xs font-medium">
+        <span
+          className="absolute text-xs font-medium"
+          style={{ color: 'rgb(var(--color-text-base))' }}
+        >
           {isFetching ? '...' : `${percentage.toFixed(0)}%`}
         </span>
       </div>
@@ -147,7 +150,24 @@ function CollectionCard({ collection, onSelect, onToggleFavorite }: CollectionCa
   return (
     <div
       onClick={() => onSelect(collection.id)}
-      className="bg-gray-800 rounded-lg p-4 cursor-pointer hover:bg-gray-700 transition-colors border border-gray-700 h-52 flex flex-col"
+      className="rounded-lg p-4 cursor-pointer transition-all duration-200 border h-52 flex flex-col shadow-sm transform"
+      style={{
+        backgroundColor: 'rgb(var(--color-card-bg))',
+        borderColor: 'rgb(var(--color-card-border))',
+      }}
+      // Adding hover styles with additional transformations for a nice effect
+      onMouseEnter={(e) => {
+        e.currentTarget.style.backgroundColor = 'rgb(var(--color-card-hover))';
+        e.currentTarget.style.transform = 'translateY(-2px)';
+        e.currentTarget.style.boxShadow =
+          '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = 'rgb(var(--color-card-bg))';
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow =
+          '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)';
+      }}
     >
       <div className="flex justify-between items-start">
         <div
@@ -160,7 +180,7 @@ function CollectionCard({ collection, onSelect, onToggleFavorite }: CollectionCa
             e.stopPropagation();
             onToggleFavorite(collection.id);
           }}
-          className="text-gray-400 hover:text-yellow-400"
+          className="text-gray-400 hover:text-yellow-400 transition-colors duration-200"
         >
           <FaStar
             className={`h-5 w-5 ${collection.isFavorite ? 'text-yellow-400 fill-current' : ''}`}
@@ -168,11 +188,17 @@ function CollectionCard({ collection, onSelect, onToggleFavorite }: CollectionCa
         </button>
       </div>
       <div className="mt-4 flex-grow flex flex-col justify-center items-center">
-        <h3 className="font-medium text-white text-xl sm:text-2xl mb-3">
+        {/* Changed to respect the current theme for text color */}
+        <h3
+          className="font-medium text-xl sm:text-2xl mb-3"
+          style={{ color: 'rgb(var(--color-text-base))' }}
+        >
           {collection.name.charAt(0).toUpperCase() + collection.name.slice(1)}
         </h3>
         <CircularProgress percentage={completionPercentage} color={getProgressColor()} />
-        <div className="mt-3 text-xs sm:text-sm text-gray-300">{getCompletionText()}</div>
+        <div className="mt-3 text-xs sm:text-sm" style={{ color: 'rgb(var(--color-text-muted))' }}>
+          {getCompletionText()}
+        </div>
       </div>
     </div>
   );
@@ -183,7 +209,13 @@ export function CollectionsGrid({ onSelect }: CollectionsGridProps) {
   const [toggleFavorite] = useToggleFavoriteMutation();
   const [activeTab, setActiveTab] = useState<'favorites' | 'all'>('all');
 
-  if (isLoading) return <div className="text-center text-gray-400">Loading collections...</div>;
+  if (isLoading)
+    return (
+      <div className="text-center" style={{ color: 'rgb(var(--color-text-muted))' }}>
+        <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+        <p className="mt-2">Loading collections...</p>
+      </div>
+    );
 
   const displayedCollections =
     activeTab === 'favorites' ? collections?.filter((c) => c.isFavorite) : collections;
@@ -191,30 +223,61 @@ export function CollectionsGrid({ onSelect }: CollectionsGridProps) {
   return (
     <div className="w-full">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-white">Collections</h1>
+        <h1 className="text-2xl font-bold" style={{ color: 'rgb(var(--color-text-base))' }}>
+          Collections
+        </h1>
         <div className="flex space-x-2">
+          {/* Enhanced tab buttons with better hover effects */}
           <button
-            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
-              activeTab === 'favorites'
-                ? 'bg-gray-800 text-white'
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-            }`}
+            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ease-in-out`}
             onClick={() => setActiveTab('favorites')}
+            style={{
+              backgroundColor:
+                activeTab === 'favorites'
+                  ? 'rgb(var(--color-primary))'
+                  : 'rgb(var(--color-card-bg))',
+              color: activeTab === 'favorites' ? '#ffffff' : 'rgb(var(--color-text-base))',
+              boxShadow:
+                activeTab === 'favorites' ? '0 2px 4px rgba(var(--color-primary), 0.3)' : 'none',
+            }}
+            onMouseEnter={(e) => {
+              if (activeTab !== 'favorites') {
+                e.currentTarget.style.backgroundColor = 'rgb(var(--color-card-hover))';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (activeTab !== 'favorites') {
+                e.currentTarget.style.backgroundColor = 'rgb(var(--color-card-bg))';
+              }
+            }}
           >
             Favorites
           </button>
           <button
-            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
-              activeTab === 'all'
-                ? 'bg-gray-800 text-white'
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-            }`}
+            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ease-in-out`}
             onClick={() => setActiveTab('all')}
+            style={{
+              backgroundColor:
+                activeTab === 'all' ? 'rgb(var(--color-primary))' : 'rgb(var(--color-card-bg))',
+              color: activeTab === 'all' ? '#ffffff' : 'rgb(var(--color-text-base))',
+              boxShadow: activeTab === 'all' ? '0 2px 4px rgba(var(--color-primary), 0.3)' : 'none',
+            }}
+            onMouseEnter={(e) => {
+              if (activeTab !== 'all') {
+                e.currentTarget.style.backgroundColor = 'rgb(var(--color-card-hover))';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (activeTab !== 'all') {
+                e.currentTarget.style.backgroundColor = 'rgb(var(--color-card-bg))';
+              }
+            }}
           >
             All
           </button>
         </div>
       </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {displayedCollections?.map((collection) => (
           <CollectionCard
@@ -224,8 +287,30 @@ export function CollectionsGrid({ onSelect }: CollectionsGridProps) {
             onToggleFavorite={toggleFavorite}
           />
         ))}
-        <div className="bg-gray-800 rounded-lg p-4 flex items-center justify-center border border-gray-700 hover:bg-gray-700 cursor-pointer transition-colors h-52">
-          <div className="flex flex-col items-center text-gray-400 hover:text-gray-300">
+        {/* Add collection card with enhanced hover effects */}
+        <div
+          className="rounded-lg p-4 flex items-center justify-center border cursor-pointer transition-all duration-200 h-52 shadow-sm transform"
+          style={{
+            backgroundColor: 'rgb(var(--color-card-bg))',
+            borderColor: 'rgb(var(--color-card-border))',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgb(var(--color-card-hover))';
+            e.currentTarget.style.transform = 'translateY(-2px)';
+            e.currentTarget.style.boxShadow =
+              '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgb(var(--color-card-bg))';
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow =
+              '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)';
+          }}
+        >
+          <div
+            className="flex flex-col items-center transition-colors duration-200"
+            style={{ color: 'rgb(var(--color-text-muted))' }}
+          >
             <FaPlus className="h-8 w-8" />
             <span className="mt-2 text-sm font-medium">Add Collection</span>
           </div>

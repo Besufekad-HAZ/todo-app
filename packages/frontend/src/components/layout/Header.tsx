@@ -1,18 +1,24 @@
+// src/components/layout/Header.tsx
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { ThemeToggle } from '../ThemeToogle';
 
 interface HeaderProps {
   onMenuToggle: () => void;
-  isDarkMode: boolean;
-  onThemeToggle: (darkMode: boolean) => void;
 }
 
-export function Header({ onMenuToggle, isDarkMode, onThemeToggle }: HeaderProps) {
+export function Header({ onMenuToggle }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
 
   return (
-    <header className="bg-gray-800 border-b border-gray-700 h-16 flex items-center px-4">
+    <header
+      className="border-b h-16 flex items-center px-4"
+      style={{
+        backgroundColor: 'rgb(var(--color-header-bg))',
+        borderColor: 'rgb(var(--color-sidebar-border))',
+      }}
+    >
       <div className="container mx-auto flex justify-between items-center">
         {/* Left section: Menu + Navigation */}
         <div className="flex items-center space-x-6">
@@ -94,8 +100,11 @@ export function Header({ onMenuToggle, isDarkMode, onThemeToggle }: HeaderProps)
 
         {/* Right Section: Action Icons */}
         <div className="flex items-center space-x-3">
+          {/* Theme Toggle */}
+          <ThemeToggle />
+
           {/* Add Task Button (Pink) */}
-          <button className="bg-pink-500 hover:bg-pink-600 text-white rounded-full h-8 w-8 flex items-center justify-center">
+          <button className="bg-primary hover:bg-primary-hover text-white rounded-full h-8 w-8 flex items-center justify-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5"

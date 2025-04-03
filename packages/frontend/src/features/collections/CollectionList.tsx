@@ -8,9 +8,15 @@ interface CollectionListProps {
   viewMode?: 'sidebar' | 'grid';
 }
 
+interface SidebarCollectionItemProps {
+  collection: Collection;
+  isActive: boolean;
+  onSelect: () => void;
+}
+
 export function CollectionList({ onSelect, viewMode = 'sidebar' }: CollectionListProps) {
   const { data: collections } = useGetCollectionsQuery();
-  const [toggleFavorite] = useToggleFavoriteMutation();
+  // const [toggleFavorite] = useToggleFavoriteMutation();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -22,11 +28,22 @@ export function CollectionList({ onSelect, viewMode = 'sidebar' }: CollectionLis
 
   const currentCollectionId = getCollectionIdFromPath();
 
+  // Custom CSS variables for sidebar colors that change with theme
+  const sidebarStyle = {
+    '--sidebar-bg': 'var(--color-sidebar-bg)',
+    '--sidebar-text': 'var(--color-sidebar-text)',
+    '--sidebar-hover': 'var(--color-sidebar-hover)',
+    '--sidebar-active': 'var(--color-primary)',
+  } as React.CSSProperties;
+
   return (
-    <div className="w-full h-full overflow-y-auto">
+    <div
+      className="w-full h-full overflow-y-auto transition-colors duration-300"
+      style={sidebarStyle}
+    >
       <div className="p-4">
-        <h2 className="text-lg font-semibold text-gray-300 mb-4">Collections</h2>
-        <div className="space-y-1">
+        <h2 className="text-lg font-semibold mb-6 text-white dark:text-gray-100">Collections</h2>
+        <div className="space-y-2">
           {collections?.map((collection) => (
             <SidebarCollectionItem
               key={collection.id}
@@ -42,12 +59,6 @@ export function CollectionList({ onSelect, viewMode = 'sidebar' }: CollectionLis
       </div>
     </div>
   );
-}
-
-interface SidebarCollectionItemProps {
-  collection: Collection;
-  isActive: boolean;
-  onSelect: () => void;
 }
 
 function SidebarCollectionItem({ collection, isActive, onSelect }: SidebarCollectionItemProps) {
@@ -70,7 +81,6 @@ function SidebarCollectionItem({ collection, isActive, onSelect }: SidebarCollec
   };
 
   // Use the same mapping as CollectionsGrid.
-  // If a name doesn't match, fallback to the "school" color (pink) rather than gray.
   const getIconBgColor = (name: string) => {
     const mapping: Record<string, string> = {
       school: 'bg-pink-500',
@@ -81,19 +91,43 @@ function SidebarCollectionItem({ collection, isActive, onSelect }: SidebarCollec
     return mapping[name.toLowerCase().trim()] || 'bg-pink-500';
   };
 
+  // Enhanced hover and active states
   return (
     <div
       onClick={onSelect}
-      className={`py-2.5 px-3 rounded-md flex items-center cursor-pointer transition-colors ${
-        isActive ? 'bg-gray-700' : 'hover:bg-gray-700'
-      }`}
+      className={`py-2.5 px-3 rounded-md flex items-center cursor-pointer transition-all duration-200`}
+      style={{
+        backgroundColor: isActive ? 'rgba(var(--color-primary), 0.2)' : 'transparent',
+        boxShadow: isActive ? '0 0 0 1px rgb(var(--color-primary))' : 'none',
+        transform: isActive ? 'translateX(2px)' : 'none',
+      }}
+      onMouseEnter={(e) => {
+        if (!isActive) {
+          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+          e.currentTarget.style.transform = 'translateX(2px)';
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!isActive) {
+          e.currentTarget.style.backgroundColor = 'transparent';
+          e.currentTarget.style.transform = 'none';
+        }
+      }}
     >
       <div
         className={`w-8 h-8 rounded-lg ${getIconBgColor(collection.name)} flex items-center justify-center text-white mr-3`}
       >
         {getIcon()}
       </div>
-      <span className="text-white font-medium">{collection.name}</span>
+      <span className="font-medium text-white dark:text-white">{collection.name}</span>
+
+      {/* Active indicator line */}
+      {isActive && (
+        <div
+          className="absolute left-0 top-0 bottom-0 w-1 rounded-r"
+          style={{ backgroundColor: 'rgb(var(--color-primary))' }}
+        ></div>
+      )}
     </div>
   );
 }

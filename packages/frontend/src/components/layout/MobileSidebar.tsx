@@ -21,7 +21,9 @@ export function MobileSidebar({
   return (
     <Dialog as="div" className="md:hidden fixed inset-0 z-50" open={isOpen} onClose={onClose}>
       <div className="fixed inset-0 bg-black/60" />
-      <div className="fixed inset-y-0 left-0 w-64 bg-gray-800 shadow-lg">
+      <div className="fixed inset-y-0 left-0 w-64 shadow-lg"
+        style={{ backgroundColor: 'rgb(var(--color-sidebar-bg))' }}
+      >
         <Dialog.Panel className="h-full overflow-y-auto">{children}</Dialog.Panel>
       </div>
     </Dialog>

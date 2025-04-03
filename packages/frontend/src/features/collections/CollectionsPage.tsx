@@ -5,11 +5,17 @@ export function CollectionsPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex-1 p-4 overflow-auto bg-gray-900 text-white">
+    <div
+      className="flex-1 p-4 overflow-auto"
+      style={{
+        backgroundColor: 'rgb(var(--color-bg-primary))',
+        color: 'rgb(var(--color-text-base))',
+      }}
+    >
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-semibold">Collections</h1>
-          <button className="text-gray-400 hover:text-gray-300">
+          <button style={{ color: 'rgb(var(--color-text-muted))' }} className="hover:text-gray-300">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-6 w-6"

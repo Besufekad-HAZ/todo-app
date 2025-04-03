@@ -1,7 +1,7 @@
 // src/features/tasks/TaskList.tsx
 import { useState } from 'react';
 import { useGetTasksByCollectionQuery, useUpdateTaskMutation } from '../../services/api';
-import { TaskItem } from './TaskItem';
+// import { TaskItem } from './TaskItem';
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { Task } from '../../types/types';
@@ -46,13 +46,14 @@ export function TaskList({ collectionId }: { collectionId: number }) {
         <div className="text-red-500 mb-2">Error loading tasks</div>
         <button
           onClick={refetch}
-          className="px-4 py-2 bg-pink-500 text-white rounded hover:bg-pink-600 transition-colors"
+          className="px-4 py-2 bg-primary text-white rounded hover:bg-primary-hover transition-colors"
         >
           Retry
         </button>
       </div>
     );
   }
+
 
   if (!tasks?.length) {
     return (
@@ -113,8 +114,9 @@ export function TaskList({ collectionId }: { collectionId: number }) {
       {/* Active Tasks Section */}
       <div className="mb-8">
         <h3
-          className="text-sm font-medium text-gray-400 mb-4 flex items-center cursor-pointer hover:text-white"
+          className="text-sm font-medium mb-4 flex items-center cursor-pointer"
           onClick={() => toggleSection('incomplete')}
+          style={{ color: 'rgb(var(--color-text-muted))' }}
         >
           Tasks - {incompleteTasks.length}
           <svg
@@ -152,8 +154,9 @@ export function TaskList({ collectionId }: { collectionId: number }) {
       {completedTasks.length > 0 && (
         <div>
           <h3
-            className="text-sm font-medium text-gray-400 mb-4 flex items-center cursor-pointer hover:text-white"
+            className="text-sm font-medium mb-4 flex items-center cursor-pointer"
             onClick={() => toggleSection('completed')}
+            style={{ color: 'rgb(var(--color-text-muted))' }}
           >
             Completed - {completedTasks.length}
             <svg
