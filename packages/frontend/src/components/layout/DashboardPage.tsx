@@ -1,18 +1,26 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { CollectionList } from '../../features/collections/CollectionList';
-import { TaskForm } from '../../features/tasks/TaskForm';
 import { TaskList } from '../../features/tasks/TaskList';
-import { EmptyState } from '../ui/EmptyState';
-import { MobileSidebar } from './MobileSidebar';
-// import { Header } from './Header';
-import { useState } from 'react';
+import { TaskForm } from '../../features/tasks/TaskForm';
+import { EmptyState } from '../../components/ui/EmptyState';
+import { MobileSidebar } from '../../components/layout/MobileSidebar';
 
-export function DashboardPage() {
+interface DashboardPageProps {
+  showTaskForm: boolean;
+  setShowTaskForm: (show: boolean) => void;
+  mobileSidebarOpen: boolean;
+  setMobileSidebarOpen: (open: boolean) => void;
+}
+
+export function DashboardPage({
+  showTaskForm,
+  setShowTaskForm,
+  mobileSidebarOpen,
+  setMobileSidebarOpen,
+}: DashboardPageProps) {
   const { collectionId } = useParams<{ collectionId?: string }>();
   const navigate = useNavigate();
   const selectedCollectionId = collectionId ? parseInt(collectionId) : null;
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const [showTaskForm, setShowTaskForm] = useState(false);
 
   return (
     <div className="flex flex-1 overflow-hidden">
@@ -34,15 +42,8 @@ export function DashboardPage() {
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col overflow-hidden">
-        {/* Add Header here */}
-        {/* <Header
-          onMenuToggle={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-          mobileSidebarOpen={mobileSidebarOpen}
-        /> */}
-
         {selectedCollectionId ? (
-          <div className="flex-1 overflow-auto">
-            {/* Collection-specific header */}
+          <>
             <div
               className="p-4 border-b flex justify-between items-center"
               style={{ borderColor: 'rgb(var(--color-border))' }}
@@ -97,9 +98,8 @@ export function DashboardPage() {
                 <span className="text-sm">Add a task</span>
               </button>
             </div>
-
             <TaskList collectionId={selectedCollectionId} />
-          </div>
+          </>
         ) : (
           <EmptyState
             icon="collection"

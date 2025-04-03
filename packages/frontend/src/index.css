@@ -40,6 +40,8 @@
   --color-sidebar-text: 255 255 255; /* white */
   --color-sidebar-muted: 156 163 175; /* gray-400 */
   --color-sidebar-border: 55 65 81; /* gray-700 */
+  --color-sidebar-hover: 75 85 99; /* gray-600 */
+  --color-sidebar-active: 107 114 128; /* gray-500 */
 
   /* Card backgrounds */
   --color-card-bg: 255 255 255; /* white */
@@ -54,23 +56,13 @@
 
   /* Transitions */
   --transition-theme: 200ms;
-
-  /* New sidebar-specific variables */
-  --color-sidebar-bg: 31 41 55; /* gray-800 - dark for both themes */
-  --color-sidebar-text: 255 255 255; /* white text for dark sidebar */
-  --color-sidebar-muted: 156 163 175; /* gray-400 */
-  --color-sidebar-border: 55 65 81; /* gray-700 */
-  --color-sidebar-hover: 75 85 99; /* gray-600 */
-  --color-sidebar-active: 107 114 128; /* gray-500 */
-
-  /* Enhanced card hover effects */
-  --card-hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --card-normal-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-
-  /* Transition durations */
   --transition-fast: 150ms;
   --transition-normal: 200ms;
   --transition-slow: 300ms;
+
+  /* Shadows */
+  --card-hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --card-normal-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
 }
 
 .dark {
@@ -100,11 +92,12 @@
   --color-input-border: 75 85 99; /* gray-600 */
   --color-input-focus: 96 165 250; /* blue-400 */
 
+  /* Sidebar */
   --color-sidebar-hover: 55 65 81; /* gray-700 */
   --color-sidebar-active: 75 85 99; /* gray-600 */
 }
 
-@layer {
+@layer base {
   body {
     color: rgb(var(--color-text-base));
     background-color: rgb(var(--color-bg-primary));
@@ -113,13 +106,14 @@
       background-color var(--transition-theme);
   }
 
-  /* All elements with transitions */
   * {
     transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: var(--transition-theme);
   }
+}
 
+@layer components {
   .btn-primary {
     @apply px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-hover
       shadow-sm focus:outline-none focus-visible:ring-2
@@ -134,9 +128,75 @@
     border-color: rgb(var(--color-input-border));
     color: rgb(var(--color-text-base));
   }
+
+  .task-actions {
+    @apply absolute right-3 top-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity
+           px-2 py-1 rounded-md shadow-sm;
+    background-color: rgb(var(--color-card-bg));
+    border: 1px solid rgb(var(--color-card-border));
+  }
+
+  .task-content {
+    @apply flex items-center justify-between pr-16;
+  }
+
+  .task-date {
+    @apply ml-2 text-xs whitespace-nowrap flex-shrink-0;
+    color: rgb(var(--color-text-muted));
+  }
+
+  .theme-card {
+    @apply transition-colors duration-200;
+    background-color: rgb(var(--color-card-bg));
+    border-color: rgb(var(--color-card-border));
+    color: rgb(var(--color-text-base));
+
+    &:hover {
+      background-color: rgb(var(--color-card-hover));
+    }
+  }
+
+  .loading-spinner {
+    border-top-color: rgb(var(--color-primary));
+  }
+
+  /* Mobile sidebar components */
+  .mobile-sidebar-item {
+    @apply flex items-center px-4 py-3 rounded-lg transition-colors;
+    color: rgb(var(--color-sidebar-text));
+
+    &:hover {
+      background-color: rgba(var(--color-sidebar-hover), 0.3);
+    }
+  }
+
+  .mobile-sidebar-link {
+    @apply flex items-center px-4 py-3 rounded-lg transition-colors duration-200;
+    color: rgb(var(--color-sidebar-text));
+
+    &:hover {
+      background-color: rgba(var(--color-sidebar-hover), 0.3);
+    }
+  }
+
+  /* Sidebar navigation */
+  .sidebar-item {
+    @apply transition-all duration-200;
+    border-left: 2px solid transparent;
+
+    &:hover {
+      background-color: rgba(var(--color-sidebar-hover), 0.2);
+    }
+
+    &.active {
+      background-color: rgba(var(--color-primary), 0.1);
+      border-left-color: rgb(var(--color-primary));
+    }
+  }
 }
 
 @layer utilities {
+  /* Drag and drop utilities */
   .drag-handle {
     touch-action: none;
   }
@@ -151,68 +211,34 @@
     border-radius: 0.375rem;
   }
 
+  /* Card hover effects */
   .hover-card-effect {
     transition:
       transform var(--transition-normal),
       box-shadow var(--transition-normal),
       background-color var(--transition-normal);
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--card-hover-shadow);
+      background-color: rgb(var(--color-card-hover));
+    }
   }
 
-  .hover-card-effect:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--card-hover-shadow);
-    background-color: rgb(var(--color-card-hover));
+  /* Color utilities */
+  .bg-sidebar-bg {
+    background-color: rgb(var(--color-sidebar-bg));
   }
 
-  .sidebar-item {
-    transition: all var(--transition-normal);
-    border-left: 2px solid transparent;
+  .bg-sidebar-hover-30 {
+    background-color: rgba(var(--color-sidebar-hover), 0.3);
   }
 
-  .sidebar-item:hover {
-    background-color: rgba(var(--color-sidebar-hover), 0.2);
+  .text-sidebar-text {
+    color: rgb(var(--color-sidebar-text));
   }
 
-  .sidebar-item.active {
-    background-color: rgba(var(--color-primary), 0.1);
-    border-left: 2px solid rgb(var(--color-primary));
-  }
-}
-
-@layer components {
-  .task-actions {
-    @apply absolute right-3 top-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity
-           px-2 py-1 rounded-md shadow-sm;
-    background-color: rgb(var(--color-card-bg));
-    border: 1px solid rgb(var(--color-card-border));
-  }
-
-  .task-content {
-    @apply flex items-center justify-between pr-16; /* Add right padding for actions */
-  }
-
-  .task-date {
-    @apply ml-2 text-xs whitespace-nowrap flex-shrink-0;
-    color: rgb(var(--color-text-muted));
-  }
-
-  /* Standard card component */
-  .theme-card {
-    background-color: rgb(var(--color-card-bg));
-    border-color: rgb(var(--color-card-border));
-    color: rgb(var(--color-text-base));
-  }
-
-  .theme-card:hover {
-    background-color: rgb(var(--color-card-hover));
-  }
-
-  /* Loading animation with theme colors */
-  .loading-spinner {
-    border-top-color: rgb(var(--color-primary));
-  }
-
-  /* Datepicker customizations */
+  /* Datepicker overrides */
   .react-datepicker {
     background-color: rgb(var(--color-card-bg)) !important;
     border-color: rgb(var(--color-card-border)) !important;
@@ -225,53 +251,14 @@
 
   .react-datepicker__day {
     color: rgb(var(--color-text-base)) !important;
-  }
 
-  .react-datepicker__day:hover {
-    background-color: rgb(var(--color-primary), 0.2) !important;
-  }
+    &:hover {
+      background-color: rgba(var(--color-primary), 0.2) !important;
+    }
 
-  .react-datepicker__day--selected {
-    background-color: rgb(var(--color-primary)) !important;
-    color: white !important;
-  }
-
-  /* .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .modal-content {
-    position: relative;
-    background: rgb(var(--color-card-bg));
-    border-radius: 0.5rem;
-    border: 1px solid rgb(var(--color-card-border));
-    max-width: 95%;
-    width: 400px;
-    padding: 1.5rem;
-  } */
-}
-
-@layer utilities {
-  .bg-primary\/20 {
-    background-color: rgba(var(--color-primary), 0.2);
-  }
-  .border-primary {
-    border-color: rgb(var(--color-primary));
-  }
-  .text-primary {
-    color: rgb(var(--color-primary));
-  }
-  .hover\:bg-sidebar-hover\/20:hover {
-    background-color: rgba(var(--color-sidebar-hover), 0.2);
-  }
-  .text-sidebar-text {
-    color: rgb(var(--color-sidebar-text));
+    &--selected {
+      background-color: rgb(var(--color-primary)) !important;
+      color: white !important;
+    }
   }
 }
