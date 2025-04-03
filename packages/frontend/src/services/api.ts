@@ -33,7 +33,6 @@ export const api = createApi({
       invalidatesTags: (_result, _error, arg) =>
         arg.collectionId ? [{ type: 'Task', id: arg.collectionId }] : [],
     }),
-    // Example for completeTask mutation
     completeTask: builder.mutation<Task, number>({
       query: (id) => ({
         url: `tasks/${id}/complete`,
@@ -84,8 +83,6 @@ export const api = createApi({
         { type: 'CollectionStats', id: result?.collectionId },
       ],
     }),
-    // In your api.ts file, add these endpoints
-    // In api.ts
 
     getCollectionStats: builder.query<{ taskCount: number; completedCount: number }, number>({
       query: (collectionId) => `collections/${collectionId}/stats`,

@@ -1,7 +1,5 @@
-// src/features/tasks/TaskList.tsx
 import { useState } from 'react';
 import { useGetTasksByCollectionQuery, useUpdateTaskMutation } from '../../services/api';
-// import { TaskItem } from './TaskItem';
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { Task } from '../../types/types';
@@ -19,9 +17,9 @@ import { SortableTaskItem } from './SortableTaskItem';
 export function TaskList({ collectionId }: { collectionId: number }) {
   const { data: tasks, isLoading, error, refetch } = useGetTasksByCollectionQuery(collectionId);
   const [updateTask] = useUpdateTaskMutation();
-  const [expandedSection, setExpandedSection] = useState<'incomplete' | 'completed' | 'both'>(
-    'both',
-  );
+  // Use separate state values for each section
+  const [incompleteExpanded, setIncompleteExpanded] = useState(true);
+  const [completedExpanded, setCompletedExpanded] = useState(true);
 
   // Configure sensors for drag and drop
   const sensors = useSensors(
@@ -68,59 +66,44 @@ export function TaskList({ collectionId }: { collectionId: number }) {
   const incompleteTasks = tasks.filter((task) => !task.completed && !task.parentId);
   const completedTasks = tasks.filter((task) => task.completed && !task.parentId);
 
-  // Handle drag end for incomplete tasks
+  // Handle drag end for tasks
   const handleDragEnd = async (event: DragEndEvent, taskGroup: Task[]) => {
     const { active, over } = event;
-
-    if (!over || active.id === over.id) {
-      return;
-    }
+    if (!over || active.id === over.id) return;
 
     const oldIndex = taskGroup.findIndex((task) => task.id === active.id);
     const newIndex = taskGroup.findIndex((task) => task.id === over.id);
 
     if (oldIndex !== -1 && newIndex !== -1) {
       const newOrder = arrayMove(taskGroup, oldIndex, newIndex);
-
-      // Update the database with the new order
       try {
-        const updatePromises = newOrder.map((task, index) => {
-          return updateTask({
+        const updatePromises = newOrder.map((task, index) =>
+          updateTask({
             id: task.id,
             order: index,
-          }).unwrap();
-        });
-
+          }).unwrap(),
+        );
         await Promise.all(updatePromises);
-        refetch(); // Refresh the task list after reordering
+        refetch();
       } catch (error) {
         console.error('Failed to update task order:', error);
       }
     }
   };
 
-  // Toggle task section expansion
-  const toggleSection = (section: 'incomplete' | 'completed') => {
-    if (expandedSection === section) {
-      setExpandedSection('both');
-    } else {
-      setExpandedSection(section);
-    }
-  };
-
   return (
     <div className="flex-1 overflow-y-auto p-4">
-      {/* Active Tasks Section */}
+      {/* Incomplete Tasks Section */}
       <div className="mb-8">
         <h3
           className="text-sm font-medium mb-4 flex items-center cursor-pointer"
-          onClick={() => toggleSection('incomplete')}
+          onClick={() => setIncompleteExpanded(prev => !prev)}
           style={{ color: 'rgb(var(--color-text-muted))' }}
         >
           Tasks - {incompleteTasks.length}
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className={`h-4 w-4 ml-1 transition-transform ${expandedSection === 'incomplete' ? 'transform rotate-180' : ''}`}
+            className={`h-4 w-4 ml-1 transition-transform ${incompleteExpanded ? 'transform rotate-180' : ''}`}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -128,8 +111,7 @@ export function TaskList({ collectionId }: { collectionId: number }) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
         </h3>
-
-        {(expandedSection === 'both' || expandedSection === 'incomplete') && (
+        {incompleteExpanded && (
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
@@ -154,27 +136,21 @@ export function TaskList({ collectionId }: { collectionId: number }) {
         <div>
           <h3
             className="text-sm font-medium mb-4 flex items-center cursor-pointer"
-            onClick={() => toggleSection('completed')}
+            onClick={() => setCompletedExpanded(prev => !prev)}
             style={{ color: 'rgb(var(--color-text-muted))' }}
           >
             Completed - {completedTasks.length}
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className={`h-4 w-4 ml-1 transition-transform ${expandedSection === 'completed' ? 'transform rotate-180' : ''}`}
+              className={`h-4 w-4 ml-1 transition-transform ${completedExpanded ? 'transform rotate-180' : ''}`}
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 9l-7 7-7-7"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
           </h3>
-
-          {(expandedSection === 'both' || expandedSection === 'completed') && (
+          {completedExpanded && (
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}

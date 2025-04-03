@@ -13,7 +13,6 @@ export interface Collection {
   updatedAt?: string;
 }
 
-// src/types/types.ts
 export interface Task {
   id: number;
   title: string;
@@ -39,7 +38,6 @@ export type DragHandleProps = {
   listeners: DraggableSyntheticListeners | undefined;
 };
 
-// types/error.ts or in your existing types file
 export interface ApiError {
   status?: number;
   data?: {

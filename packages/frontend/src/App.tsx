@@ -147,7 +147,7 @@ function DashboardPage({
           <EmptyState
             icon="collection"
             title="No collection selected"
-            description="Select a collection to view tasks"
+            description="Select a collection from the menu to view tasks"
           />
         )}
       </main>

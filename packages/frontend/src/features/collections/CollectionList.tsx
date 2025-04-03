@@ -80,7 +80,6 @@ function SidebarCollectionItem({ collection, isActive, onSelect }: SidebarCollec
     }
   };
 
-  // Use the same mapping as CollectionsGrid.
   const getIconBgColor = (name: string) => {
     const mapping: Record<string, string> = {
       school: 'bg-pink-500',
@@ -91,28 +90,11 @@ function SidebarCollectionItem({ collection, isActive, onSelect }: SidebarCollec
     return mapping[name.toLowerCase().trim()] || 'bg-pink-500';
   };
 
-  // Enhanced hover and active states
   return (
     <div
       onClick={onSelect}
-      className={`py-2.5 px-3 rounded-md flex items-center cursor-pointer transition-all duration-200`}
-      style={{
-        backgroundColor: isActive ? 'rgba(var(--color-primary), 0.2)' : 'transparent',
-        boxShadow: isActive ? '0 0 0 1px rgb(var(--color-primary))' : 'none',
-        transform: isActive ? 'translateX(2px)' : 'none',
-      }}
-      onMouseEnter={(e) => {
-        if (!isActive) {
-          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
-          e.currentTarget.style.transform = 'translateX(2px)';
-        }
-      }}
-      onMouseLeave={(e) => {
-        if (!isActive) {
-          e.currentTarget.style.backgroundColor = 'transparent';
-          e.currentTarget.style.transform = 'none';
-        }
-      }}
+      className={`relative py-2.5 px-3 rounded-md flex items-center cursor-pointer transition-all duration-200
+        ${isActive ? 'bg-primary/20 border-l-4 border-white translate-x-2' : 'hover:bg-sidebar-hover/20'}`}
     >
       <div
         className={`w-8 h-8 rounded-lg ${getIconBgColor(collection.name)} flex items-center justify-center text-white mr-3`}
@@ -120,14 +102,7 @@ function SidebarCollectionItem({ collection, isActive, onSelect }: SidebarCollec
         {getIcon()}
       </div>
       <span className="font-medium text-white dark:text-white">{collection.name}</span>
-
-      {/* Active indicator line */}
-      {isActive && (
-        <div
-          className="absolute left-0 top-0 bottom-0 w-1 rounded-r"
-          style={{ backgroundColor: 'rgb(var(--color-primary))' }}
-        ></div>
-      )}
+      {isActive && <div className="ml-auto w-2 h-2 rounded-full bg-primary animate-pulse" />}
     </div>
   );
 }

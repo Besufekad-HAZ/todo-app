@@ -227,51 +227,23 @@ export function CollectionsGrid({ onSelect }: CollectionsGridProps) {
           Collections
         </h1>
         <div className="flex space-x-2">
-          {/* Enhanced tab buttons with better hover effects */}
           <button
-            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ease-in-out`}
+            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ease-in-out ${
+              activeTab === 'favorites'
+                ? 'bg-primary text-white'
+                : 'bg-card-bg text-text-base hover:bg-card-hover'
+            }`}
             onClick={() => setActiveTab('favorites')}
-            style={{
-              backgroundColor:
-                activeTab === 'favorites'
-                  ? 'rgb(var(--color-primary))'
-                  : 'rgb(var(--color-card-bg))',
-              color: activeTab === 'favorites' ? '#ffffff' : 'rgb(var(--color-text-base))',
-              boxShadow:
-                activeTab === 'favorites' ? '0 2px 4px rgba(var(--color-primary), 0.3)' : 'none',
-            }}
-            onMouseEnter={(e) => {
-              if (activeTab !== 'favorites') {
-                e.currentTarget.style.backgroundColor = 'rgb(var(--color-card-hover))';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (activeTab !== 'favorites') {
-                e.currentTarget.style.backgroundColor = 'rgb(var(--color-card-bg))';
-              }
-            }}
           >
             Favorites
           </button>
           <button
-            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ease-in-out`}
+            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ease-in-out ${
+              activeTab === 'all'
+                ? 'bg-primary text-white'
+                : 'bg-card-bg text-text-base hover:bg-card-hover'
+            }`}
             onClick={() => setActiveTab('all')}
-            style={{
-              backgroundColor:
-                activeTab === 'all' ? 'rgb(var(--color-primary))' : 'rgb(var(--color-card-bg))',
-              color: activeTab === 'all' ? '#ffffff' : 'rgb(var(--color-text-base))',
-              boxShadow: activeTab === 'all' ? '0 2px 4px rgba(var(--color-primary), 0.3)' : 'none',
-            }}
-            onMouseEnter={(e) => {
-              if (activeTab !== 'all') {
-                e.currentTarget.style.backgroundColor = 'rgb(var(--color-card-hover))';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (activeTab !== 'all') {
-                e.currentTarget.style.backgroundColor = 'rgb(var(--color-card-bg))';
-              }
-            }}
           >
             All
           </button>

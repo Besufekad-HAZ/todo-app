@@ -39,7 +39,7 @@ export const completeTaskWithSubtasks = async (taskId: number, complete: boolean
 export const getTasksByCollection = async (collectionId: number): Promise<Task[]> => {
   return prisma.task.findMany({
     where: { collectionId, parentId: null },
-    include: { subtasks: true }, // Assuming you have a self-relation for subtasks
+    include: { subtasks: true },
     orderBy: [{ order: 'asc' }, { createdAt: 'asc' }],
   });
 };
