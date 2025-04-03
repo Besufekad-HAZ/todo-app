@@ -54,7 +54,6 @@ export function TaskList({ collectionId }: { collectionId: number }) {
     );
   }
 
-
   if (!tasks?.length) {
     return (
       <EmptyState
