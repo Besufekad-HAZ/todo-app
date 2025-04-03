@@ -198,11 +198,6 @@ export function TaskForm({
                         className={`flex items-center gap-2 w-full px-3 py-2 text-left hover:bg-gray-700 ${
                           collection.id === selectedCollectionId ? 'bg-gray-700' : ''
                         }`}
-                        style={{
-                          ':hover': {
-                            backgroundColor: 'rgb(var(--color-card-hover))',
-                          },
-                        }}
                         onClick={() => {
                           setSelectedCollectionId(collection.id);
                           setShowCollectionDropdown(false);
@@ -279,7 +274,8 @@ export function TaskForm({
                         boundary: document.body,
                       },
                       fn: function (
-                        state: MiddlewareState,
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        _state: MiddlewareState,
                       ): MiddlewareReturn | Promise<MiddlewareReturn> {
                         throw new Error('Function not implemented.');
                       },
@@ -350,12 +346,9 @@ export function TaskForm({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-3 font-medium transition-colors"
+              className="flex-1 py-3 font-medium transition-colors hover:bg-[rgb(var(--color-card-hover))]"
               style={{
                 color: 'rgb(var(--color-text-muted))',
-                ':hover': {
-                  backgroundColor: 'rgb(var(--color-card-hover))',
-                },
               }}
             >
               Cancel

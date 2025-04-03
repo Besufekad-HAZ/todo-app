@@ -1,4 +1,4 @@
-import { useGetCollectionsQuery, useToggleFavoriteMutation } from '../../services/api';
+import { useGetCollectionsQuery } from '../../services/api';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Collection } from '../../types/types';
 import { FaSchool, FaUser, FaPaintBrush, FaShoppingCart, FaPlus } from 'react-icons/fa';
@@ -14,7 +14,7 @@ interface SidebarCollectionItemProps {
   onSelect: () => void;
 }
 
-export function CollectionList({ onSelect, viewMode = 'sidebar' }: CollectionListProps) {
+export function CollectionList({ onSelect }: CollectionListProps) {
   const { data: collections } = useGetCollectionsQuery();
   // const [toggleFavorite] = useToggleFavoriteMutation();
   const navigate = useNavigate();

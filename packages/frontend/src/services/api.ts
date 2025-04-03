@@ -22,7 +22,7 @@ export const api = createApi({
     // Tasks
     getTasksByCollection: builder.query<Task[], number>({
       query: (collectionId) => `tasks/collection/${collectionId}`,
-      providesTags: (result, error, arg) => [{ type: 'Task', id: arg }],
+      providesTags: (_result, _error, arg) => [{ type: 'Task', id: arg }],
     }),
     createTask: builder.mutation<Task, Partial<Task>>({
       query: (task) => ({
@@ -30,7 +30,7 @@ export const api = createApi({
         method: 'POST',
         body: task,
       }),
-      invalidatesTags: (result, error, arg) =>
+      invalidatesTags: (_result, _error, arg) =>
         arg.collectionId ? [{ type: 'Task', id: arg.collectionId }] : [],
     }),
     // Example for completeTask mutation
@@ -61,7 +61,8 @@ export const api = createApi({
         url: `tasks/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: (result, error, arg) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      invalidatesTags: (result, _error, _arg) => {
         if ((result as Task)?.collectionId) {
           return [{ type: 'Task', id: (result as Task).collectionId }];
         }
@@ -88,7 +89,7 @@ export const api = createApi({
 
     getCollectionStats: builder.query<{ taskCount: number; completedCount: number }, number>({
       query: (collectionId) => `collections/${collectionId}/stats`,
-      providesTags: (result, error, arg) => [
+      providesTags: (_result, _error, arg) => [
         { type: 'CollectionStats', id: arg },
         { type: 'Collection', id: arg },
       ],
@@ -98,7 +99,7 @@ export const api = createApi({
         url: `collections/${collectionId}/stats`,
         method: 'PUT',
       }),
-      invalidatesTags: (result, error, arg) => [{ type: 'Collection', id: arg }],
+      invalidatesTags: (_result, _error, arg) => [{ type: 'Collection', id: arg }],
     }),
   }),
 });

@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react';
-import { Task } from '../../types/types';
+import { useState } from 'react';
+import { Task, ApiError } from '../../types/types';
 import {
   useCompleteTaskWithSubtasksMutation,
   useDeleteTaskMutation,
@@ -32,22 +32,38 @@ export function TaskItem({
   const [deleteTask] = useDeleteTaskMutation();
   const [updateTask] = useUpdateTaskMutation();
 
+  // Example for handleComplete
   const handleComplete = async () => {
     try {
       await completeTask({ id: task.id, complete: !task.completed }).unwrap();
       onTaskUpdated?.();
-    } catch (error) {
-      toast.error('Failed to update task');
+    } catch (error: unknown) {
+      let errorMessage = 'Failed to update task';
+
+      if (typeof error === 'object' && error !== null && 'data' in error) {
+        const apiError = error as ApiError;
+        errorMessage = apiError.data?.message || apiError.message || errorMessage;
+      }
+
+      toast.error(errorMessage);
     }
   };
 
+  // Example for handleDelete
   const handleDelete = async () => {
     try {
       await deleteTask(task.id).unwrap();
       toast.success('Task deleted successfully');
       onTaskUpdated?.();
-    } catch (error) {
-      toast.error('Failed to delete task');
+    } catch (error: unknown) {
+      let errorMessage = 'Failed to delete task';
+
+      if (typeof error === 'object' && error !== null && 'data' in error) {
+        const apiError = error as ApiError;
+        errorMessage = apiError.data?.message || apiError.message || errorMessage;
+      }
+
+      toast.error(errorMessage);
     } finally {
       setShowDeleteConfirm(false);
     }
@@ -130,14 +146,12 @@ export function TaskItem({
     <div
       className={`group relative py-3 px-4 rounded-lg transition-colors duration-200 ${
         depth > 0 ? 'ml-3' : ''
-      } ${isDragging ? 'shadow-lg ring-2 ring-primary ring-opacity-50' : ''}`}
+      } ${isDragging ? 'shadow-lg ring-2 ring-primary ring-opacity-50' : ''}
+  hover:bg-[rgb(var(--color-card-hover))]`}
       style={{
         backgroundColor: 'rgb(var(--color-card-bg))',
         borderLeft: depth > 0 ? `2px solid rgb(var(--color-border))` : undefined,
         paddingLeft: depth ? `${depth * 12 + 16}px` : '16px',
-        ':hover': {
-          backgroundColor: 'rgb(var(--color-card-hover))',
-        },
       }}
     >
       {/* Drag Handle */}
@@ -202,7 +216,7 @@ export function TaskItem({
         <div className="flex items-start gap-3">
           {/* Drag handle for reordering */}
           <div
-            {...dragHandleProps}
+            {...(dragHandleProps as object)}
             className="touch-none flex items-center cursor-grab active:cursor-grabbing -ml-1.5 mr-0.5"
             style={{ color: 'rgb(var(--color-text-muted))' }}
           >

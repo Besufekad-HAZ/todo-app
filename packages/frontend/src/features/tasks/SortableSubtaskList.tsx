@@ -5,6 +5,7 @@ import { SortableTaskItem } from './SortableTaskItem';
 import { Task } from '../../types/types';
 import { useUpdateTaskMutation } from '../../services/api';
 import { arrayMove } from '@dnd-kit/sortable';
+import { DragEndEvent } from '@dnd-kit/core';
 
 interface SortableSubtasksListProps {
   subtasks: Task[];
@@ -26,7 +27,7 @@ export function SortableSubtasksList({
     }),
   );
 
-  const handleDragEnd = async (event: any) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
 
     if (!over || active.id === over.id) {

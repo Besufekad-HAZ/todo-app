@@ -23,7 +23,8 @@ export interface Task {
   parentId?: number;
   subtasks?: Task[];
   order?: number;
-  isExpanded?: boolean; // For UI toggling
+  isExpanded?: boolean;
+  tags?: string[];
 }
 
 export type DragHandleProps = {
@@ -37,3 +38,14 @@ export type DragHandleProps = {
   };
   listeners: DraggableSyntheticListeners | undefined;
 };
+
+// types/error.ts or in your existing types file
+export interface ApiError {
+  status?: number;
+  data?: {
+    message?: string;
+    error?: string;
+  };
+  error?: string;
+  message?: string;
+}

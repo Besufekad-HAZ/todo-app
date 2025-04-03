@@ -13,6 +13,7 @@ export class ErrorBoundary extends Component<Props, State> {
   state: State = { hasError: false };
 
   static getDerivedStateFromError(_: Error): State {
+    void _;
     return { hasError: true };
   }
 

@@ -7,6 +7,7 @@ export const getTasksByCollection = async (req: Request, res: Response) => {
     const tasks = await TaskRepository.getTasksByCollection(Number(collectionId));
     res.json(tasks || []); // Always return an array, even if empty
   } catch (error) {
+    console.error('Error fetching tasks:', error);
     res.status(500).json({ error: 'Failed to fetch tasks' });
   }
 };
@@ -38,6 +39,8 @@ export const createTask: RequestHandler<
     });
     res.status(201).json(task);
   } catch (error) {
+    console.error('Error creating task:', error);
+    // Handle specific error cases if needed
     res.status(500).json({ error: 'Failed to create task' });
   }
 };
@@ -49,6 +52,7 @@ export const completeTask = async (req: Request, res: Response) => {
     await TaskRepository.completeTaskWithSubtasks(Number(id), true);
     res.json({ message: 'Task and subtasks marked as completed' });
   } catch (error) {
+    console.error('Error completing task:', error);
     res.status(500).json({ error: 'Failed to complete task' });
   }
 };
@@ -67,6 +71,7 @@ export const updateTask = async (req: Request, res: Response) => {
     });
     res.json(updatedTask);
   } catch (error) {
+    console.error('Error updating task:', error);
     res.status(500).json({ error: 'Failed to update task' });
   }
 };
@@ -78,6 +83,7 @@ export const deleteTask = async (req: Request, res: Response) => {
     await TaskRepository.deleteTaskWithSubtasks(Number(id));
     res.json({ message: 'Task and subtasks deleted successfully' });
   } catch (error) {
+    console.error('Error deleting task:', error);
     res.status(500).json({ error: 'Failed to delete task' });
   }
 };
@@ -89,6 +95,8 @@ export const toggleTask = async (req: Request, res: Response) => {
     const toggledTask = await TaskRepository.toggleTask(Number(id));
     res.json(toggledTask);
   } catch (error) {
+    console.error('Error toggling task:', error);
+    // Handle specific error cases if needed
     res.status(500).json({ error: 'Failed to toggle task' });
   }
 };
@@ -101,6 +109,8 @@ export const completeTaskWithSubtasks = async (req: Request, res: Response) => {
     await TaskRepository.completeTaskWithSubtasks(Number(id), !!complete);
     res.json({ message: 'Task and subtasks updated successfully' });
   } catch (error) {
+    console.error('Error completing task and subtasks:', error);
+    // Handle specific error cases if needed
     res.status(500).json({ error: 'Failed to update task and subtasks' });
   }
 };
