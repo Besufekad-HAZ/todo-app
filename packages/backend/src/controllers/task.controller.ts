@@ -23,7 +23,7 @@ export const createTask: RequestHandler<
     date?: string;
     parentId?: number;
   }
-> = async (req, res) => {
+> = async (req: Request, res: Response) => {
   const { title, collectionId, date, parentId } = req.body;
   if (!title || !collectionId) {
     res.status(400).json({ error: 'Title and collectionId are required' });

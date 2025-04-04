@@ -5,7 +5,15 @@ import {
   useGetCollectionStatsQuery,
 } from '../../services/api';
 import { Collection } from '../../types/types';
-import { FaSchool, FaUser, FaPaintBrush, FaShoppingCart, FaPlus, FaStar, FaRegBell } from 'react-icons/fa';
+import {
+  FaSchool,
+  FaUser,
+  FaPaintBrush,
+  FaShoppingCart,
+  FaPlus,
+  FaStar,
+  FaRegBell,
+} from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface CollectionsGridProps {
@@ -272,33 +280,33 @@ export function CollectionsGrid({ onSelect }: CollectionsGridProps) {
           />
         ))}
         {/* Updated Add Collection Card */}
-      <div
-        className="rounded-lg p-4 flex items-center justify-center border cursor-pointer transition-all duration-200 h-52 shadow-sm transform hover-card-effect"
-        style={{
-          backgroundColor: 'rgb(var(--color-card-bg))',
-          borderColor: 'rgb(var(--color-card-border))',
-        }}
-        onClick={() => {
-          setShowComingSoon(true);
-          setTimeout(() => setShowComingSoon(false), 3000);
-        }}
-      >
-        <motion.div
-          className="flex flex-col items-center"
-          style={{ color: 'rgb(var(--color-text-muted))' }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+        <div
+          className="rounded-lg p-4 flex items-center justify-center border cursor-pointer transition-all duration-200 h-52 shadow-sm transform hover-card-effect"
+          style={{
+            backgroundColor: 'rgb(var(--color-card-bg))',
+            borderColor: 'rgb(var(--color-card-border))',
+          }}
+          onClick={() => {
+            setShowComingSoon(true);
+            setTimeout(() => setShowComingSoon(false), 3000);
+          }}
         >
           <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
+            className="flex flex-col items-center"
+            style={{ color: 'rgb(var(--color-text-muted))' }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
-            <FaPlus className="h-8 w-8" />
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ repeat: Infinity, duration: 4, ease: 'linear' }}
+            >
+              <FaPlus className="h-8 w-8" />
+            </motion.div>
+            <span className="mt-2 text-sm font-medium">Add Collection</span>
           </motion.div>
-          <span className="mt-2 text-sm font-medium">Add Collection</span>
-        </motion.div>
+        </div>
       </div>
-    </div>
     </div>
   );
 }
