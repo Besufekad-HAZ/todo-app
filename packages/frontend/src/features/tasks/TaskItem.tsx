@@ -288,7 +288,9 @@ export function TaskItem({
                 <button onClick={toggleExpand} className="ml-2 text-gray-400 hover:text-white">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className={`h-5 w-5 transition-transform ${isExpanded ? 'transform rotate-180' : ''}`}
+                    className={`h-5 w-5 transition-transform ${
+                      isExpanded ? 'transform rotate-180' : ''
+                    }`}
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"

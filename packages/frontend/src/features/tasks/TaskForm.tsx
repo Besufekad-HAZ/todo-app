@@ -173,7 +173,9 @@ export function TaskForm({
               <div className="relative">
                 <button
                   type="button"
-                  className={`flex items-center gap-1 px-3 py-1.5 bg-opacity-20 rounded-md text-sm ${getCollectionTextColor(selectedCollection.name)}`}
+                  className={`flex items-center gap-1 px-3 py-1.5 bg-opacity-20 rounded-md text-sm ${getCollectionTextColor(
+                    selectedCollection.name,
+                  )}`}
                   onClick={() => setShowCollectionDropdown(!showCollectionDropdown)}
                 >
                   <span

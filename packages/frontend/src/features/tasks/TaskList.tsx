@@ -103,7 +103,9 @@ export function TaskList({ collectionId }: { collectionId: number }) {
           Tasks - {incompleteTasks.length}
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className={`h-4 w-4 ml-1 transition-transform ${incompleteExpanded ? 'transform rotate-180' : ''}`}
+            className={`h-4 w-4 ml-1 transition-transform ${
+              incompleteExpanded ? 'transform rotate-180' : ''
+            }`}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -142,7 +144,9 @@ export function TaskList({ collectionId }: { collectionId: number }) {
             Completed - {completedTasks.length}
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className={`h-4 w-4 ml-1 transition-transform ${completedExpanded ? 'transform rotate-180' : ''}`}
+              className={`h-4 w-4 ml-1 transition-transform ${
+                completedExpanded ? 'transform rotate-180' : ''
+              }`}
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"

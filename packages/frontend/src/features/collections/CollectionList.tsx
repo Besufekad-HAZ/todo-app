@@ -94,10 +94,16 @@ function SidebarCollectionItem({ collection, isActive, onSelect }: SidebarCollec
     <div
       onClick={onSelect}
       className={`relative py-2.5 px-3 rounded-md flex items-center cursor-pointer transition-all duration-200
-        ${isActive ? 'bg-primary/20 border-l-4 border-white translate-x-2' : 'hover:bg-sidebar-hover/20'}`}
+        ${
+          isActive
+            ? 'bg-primary/20 border-l-4 border-white translate-x-2'
+            : 'hover:bg-sidebar-hover/20'
+        }`}
     >
       <div
-        className={`w-8 h-8 rounded-lg ${getIconBgColor(collection.name)} flex items-center justify-center text-white mr-3`}
+        className={`w-8 h-8 rounded-lg ${getIconBgColor(
+          collection.name,
+        )} flex items-center justify-center text-white mr-3`}
       >
         {getIcon()}
       </div>
