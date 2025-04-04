@@ -4,14 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --watch src --exec ts-node src/index.ts",
+    "dev": "nodemon --watch packages/backend/src --exec ts-node packages/backend/src/index.ts",
     "postinstall": "prisma generate",
     "migrate": "prisma migrate deploy",
     "build": "tsc",
-    "start": "npm run migrate && node dist/index.js",
+    "start": "npm run migrate && node packages/backend/dist/index.js",
     "test": "jest --forceExit --detectOpenHandles --coverage",
     "test:watch": "jest --watch --forceExit --detectOpenHandles",
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "ts-node packages/backend/prisma/seed.ts"
   },
   "keywords": [],
   "author": "",
