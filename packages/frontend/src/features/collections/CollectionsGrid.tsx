@@ -46,16 +46,6 @@ function CollectionCard({ collection, onSelect, onToggleFavorite }: CollectionCa
     return Math.min(100, Math.max(0, Math.round(calculated)));
   }, [taskCount, completedCount]);
 
-  // Debug output
-  useEffect(() => {
-    console.log(`Collection ${collection.id} Stats:`, {
-      taskCount,
-      completedCount,
-      calculatedPercentage: completionPercentage,
-      isFetching,
-    });
-  }, [collection.id, taskCount, completedCount, completionPercentage, isFetching]);
-
   const normalizedCollectionName = collection.name.toLowerCase().trim();
 
   const getIcon = () => {
