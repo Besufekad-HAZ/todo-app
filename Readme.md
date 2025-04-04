@@ -3,7 +3,7 @@
 </h1>
 
 <p align="center">
-  <img src="https://cdn.dribbble.com/userupload/31688600/file/original-e6f1cc798a81c7754e2d2298f31f40ce.png?resize=752x&vertical=center" alt="Todo App Logo" width="140" height="auto" />
+  <img src="https://img.freepik.com/premium-psd/3d-todo-list-icon-illustration_261703-346.jpg" alt="Todo App Logo" width="300" height="auto" />
 </p>
 
 ## 📗 Table of Contents
