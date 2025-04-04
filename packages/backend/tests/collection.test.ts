@@ -1,10 +1,33 @@
 import request from 'supertest';
-import app from '../src/server';
+import { createApp } from '../src/index';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
+const app = createApp();
+import { Server } from 'http';
+let server: Server;
 
 describe('Collections API', () => {
+  beforeAll(async () => {
+    // Clear test data
+    await prisma.task.deleteMany();
+    await prisma.collection.deleteMany();
+
+    // Seed test data
+    await prisma.collection.createMany({
+      data: [{ name: 'Test Collection 1', isFavorite: true }, { name: 'Test Collection 2' }],
+    });
+
+    // Start server on random port
+    server = app.listen(0);
+  });
+
+  afterAll(async () => {
+    // Close server and database connection
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+    await prisma.$disconnect();
+  });
+
   describe('GET /api/collections', () => {
     it('should return all collections with task counts', async () => {
       const response = await request(app).get('/api/collections');
@@ -29,7 +52,6 @@ describe('Collections API', () => {
 
     it('should return 400 if name is missing', async () => {
       const response = await request(app).post('/api/collections').send({});
-
       expect(response.status).toBe(400);
       expect(response.body.error).toBe('Name is required');
     });
@@ -39,7 +61,6 @@ describe('Collections API', () => {
     it('should toggle favorite status', async () => {
       // First get a collection to test with
       const collection = await prisma.collection.findFirst();
-
       const initialStatus = collection?.isFavorite;
       const response = await request(app)
         .patch(`/api/collections/${collection?.id}/favorite`)
