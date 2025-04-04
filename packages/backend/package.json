@@ -5,8 +5,10 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --watch src --exec ts-node src/index.ts",
+    "postinstall": "prisma generate",
+    "migrate": "prisma migrate deploy",
     "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "npm run migrate && node dist/index.js",
     "test": "jest --forceExit --detectOpenHandles --coverage",
     "test:watch": "jest --watch --forceExit --detectOpenHandles",
     "seed": "ts-node prisma/seed.ts"
