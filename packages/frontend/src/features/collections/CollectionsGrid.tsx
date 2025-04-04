@@ -5,7 +5,8 @@ import {
   useGetCollectionStatsQuery,
 } from '../../services/api';
 import { Collection } from '../../types/types';
-import { FaSchool, FaUser, FaPaintBrush, FaShoppingCart, FaPlus, FaStar } from 'react-icons/fa';
+import { FaSchool, FaUser, FaPaintBrush, FaShoppingCart, FaPlus, FaStar, FaRegBell } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface CollectionsGridProps {
   onSelect: (id: number) => void;
@@ -208,6 +209,7 @@ export function CollectionsGrid({ onSelect }: CollectionsGridProps) {
   const { data: collections, isLoading } = useGetCollectionsQuery();
   const [toggleFavorite] = useToggleFavoriteMutation();
   const [activeTab, setActiveTab] = useState<'favorites' | 'all'>('all');
+  const [showComingSoon, setShowComingSoon] = useState(false);
 
   if (isLoading)
     return (
@@ -221,7 +223,24 @@ export function CollectionsGrid({ onSelect }: CollectionsGridProps) {
     activeTab === 'favorites' ? collections?.filter((c) => c.isFavorite) : collections;
 
   return (
-    <div className="w-full">
+    <div className="w-full relative">
+      {/* Coming Soon Notification */}
+      <AnimatePresence>
+        {showComingSoon && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ type: 'spring', damping: 25 }}
+            className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50"
+          >
+            <div className="flex items-center bg-primary text-white px-4 py-3 rounded-lg shadow-xl">
+              <FaRegBell className="mr-2 animate-pulse" />
+              <span>Coming soon! We're working on this feature.</span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <div className="flex justify-between items-center mb-6">
         <h1
           className="text-2xl sm:text-3xl font-bold"
@@ -262,35 +281,34 @@ export function CollectionsGrid({ onSelect }: CollectionsGridProps) {
             onToggleFavorite={toggleFavorite}
           />
         ))}
-        {/* Add collection card with enhanced hover effects */}
-        <div
-          className="rounded-lg p-4 flex items-center justify-center border cursor-pointer transition-all duration-200 h-52 shadow-sm transform"
-          style={{
-            backgroundColor: 'rgb(var(--color-card-bg))',
-            borderColor: 'rgb(var(--color-card-border))',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgb(var(--color-card-hover))';
-            e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.boxShadow =
-              '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgb(var(--color-card-bg))';
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow =
-              '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)';
-          }}
+        {/* Updated Add Collection Card */}
+      <div
+        className="rounded-lg p-4 flex items-center justify-center border cursor-pointer transition-all duration-200 h-52 shadow-sm transform hover-card-effect"
+        style={{
+          backgroundColor: 'rgb(var(--color-card-bg))',
+          borderColor: 'rgb(var(--color-card-border))',
+        }}
+        onClick={() => {
+          setShowComingSoon(true);
+          setTimeout(() => setShowComingSoon(false), 3000);
+        }}
+      >
+        <motion.div
+          className="flex flex-col items-center"
+          style={{ color: 'rgb(var(--color-text-muted))' }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
         >
-          <div
-            className="flex flex-col items-center transition-colors duration-200"
-            style={{ color: 'rgb(var(--color-text-muted))' }}
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
           >
             <FaPlus className="h-8 w-8" />
-            <span className="mt-2 text-sm font-medium">Add Collection</span>
-          </div>
-        </div>
+          </motion.div>
+          <span className="mt-2 text-sm font-medium">Add Collection</span>
+        </motion.div>
       </div>
+    </div>
     </div>
   );
 }

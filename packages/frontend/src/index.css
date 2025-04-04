@@ -193,6 +193,25 @@
       border-left-color: rgb(var(--color-primary));
     }
   }
+  .hover-card-effect {
+    @apply transition-all duration-200;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--card-hover-shadow);
+      background-color: rgb(var(--color-card-hover));
+    }
+  }
+
+  .coming-soon-notification {
+    @apply flex items-center bg-primary text-white px-4 py-3 rounded-lg shadow-xl;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
 }
 
 @layer utilities {
