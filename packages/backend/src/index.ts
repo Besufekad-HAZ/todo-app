@@ -1,4 +1,3 @@
-// src/index.ts
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -18,7 +17,7 @@ export function createApp() {
   app.use('/api/tasks', tasksRouter);
 
   // Health check
-  app.get('/api/health', (req, res) => {
+  app.get('/api/health', (req: express.Request, res: express.Response) => {
     res.send('Server is healthy');
   });
 
