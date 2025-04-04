@@ -8,6 +8,7 @@
     "postinstall": "prisma generate",
     "migrate": "prisma migrate deploy",
     "build": "tsc",
+    "postbuild": "ls -la packages/backend/dist/",
     "start": "npm run migrate && node packages/backend/dist/index.js",
     "test": "jest --forceExit --detectOpenHandles --coverage",
     "test:watch": "jest --watch --forceExit --detectOpenHandles",
