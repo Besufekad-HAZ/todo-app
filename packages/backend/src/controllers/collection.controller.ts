@@ -53,9 +53,15 @@ export const getCollectionStats: RequestHandler<{ id: string }> = async (
   try {
     const stats = await CollectionRepository.getCollectionStats(Number(id));
     res.json(stats);
+    return;
   } catch (error) {
+    if (error instanceof Error && error.message === 'Collection not found') {
+      res.status(404).json({ error: error.message });
+      return;
+    }
     console.error(error);
     res.status(500).json({ error: 'Failed to fetch collection stats' });
+    return;
   }
 };
 

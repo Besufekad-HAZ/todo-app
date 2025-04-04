@@ -32,34 +32,26 @@ export const getCollections = async (): Promise<
 };
 
 export const getCollectionStats = async (id: number) => {
-  // Cache with 1-second freshness check
-  const cached = statsCache.get(id);
-  if (cached && new Date().getTime() - cached.lastUpdated.getTime() < 1000) {
-    return cached;
-  }
-
   const collection = await prisma.collection.findUnique({
     where: { id },
     include: {
       tasks: {
         select: {
-          id: true,
           completed: true,
         },
       },
     },
   });
 
-  if (!collection) throw new Error('Collection not found');
+  if (!collection) {
+    throw new Error('Collection not found');
+  }
 
-  const stats = {
+  return {
     taskCount: collection.tasks.length,
     completedCount: collection.tasks.filter((t) => t.completed).length,
     lastUpdated: new Date(),
   };
-
-  statsCache.set(id, stats);
-  return stats;
 };
 
 export const invalidateStatsCache = (collectionId: number) => {
