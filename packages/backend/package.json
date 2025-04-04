@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --watch src --exec ts-node src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js",
+    "build": "tsc && prisma generate",
+    "typecheck": "tsc --noEmit",
+    "start": "node -r dotenv/config dist/index.js",
     "test": "jest --forceExit --detectOpenHandles --coverage",
     "test:watch": "jest --watch --forceExit --detectOpenHandles",
     "seed": "ts-node prisma/seed.ts"

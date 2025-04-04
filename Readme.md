@@ -85,9 +85,7 @@ A full-stack Todo application built with modern web technologies featuring neste
 
   <img src="https://github.com/user-attachments/assets/8f799bc7-40a7-4191-96c2-5d81f8fb5f8c" alt="Screenshot 2" width="600" />
 
-
   <img src="https://github.com/user-attachments/assets/e534e48e-c79d-4a2c-9c77-dca5b0fbc945" alt="Screenshot 3" width="600" />
-
 
 </p>
 

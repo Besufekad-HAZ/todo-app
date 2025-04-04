@@ -1,7 +1,10 @@
 import { Request, RequestHandler, Response } from 'express';
 import * as TaskRepository from '../repositories/task.repository';
 
-export const getTasksByCollection = async (req: Request, res: Response) => {
+export const getTasksByCollection: RequestHandler<{ collectionId: string }> = async (
+  req: Request,
+  res: Response,
+) => {
   const { collectionId } = req.params;
   try {
     const tasks = await TaskRepository.getTasksByCollection(Number(collectionId));
@@ -12,18 +15,17 @@ export const getTasksByCollection = async (req: Request, res: Response) => {
   }
 };
 
-// createTask
 export const createTask: RequestHandler<
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-  {},
-  unknown,
+  {}, // No URL parameters
+  unknown, // Response type (unknown lets you infer later)
   {
     title: string;
     collectionId: number;
     date?: string;
     parentId?: number;
   }
-> = async (req, res) => {
+> = async (req: Request, res: Response) => {
   const { title, collectionId, date, parentId } = req.body;
   if (!title || !collectionId) {
     res.status(400).json({ error: 'Title and collectionId are required' });
@@ -40,12 +42,11 @@ export const createTask: RequestHandler<
     res.status(201).json(task);
   } catch (error) {
     console.error('Error creating task:', error);
-    // Handle specific error cases if needed
     res.status(500).json({ error: 'Failed to create task' });
   }
 };
 
-export const completeTask = async (req: Request, res: Response) => {
+export const completeTask: RequestHandler<{ id: string }> = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     // Pass "true" as the second argument
@@ -57,8 +58,17 @@ export const completeTask = async (req: Request, res: Response) => {
   }
 };
 
-// Update Task
-export const updateTask = async (req: Request, res: Response) => {
+export const updateTask: RequestHandler<
+  { id: string },
+  unknown,
+  {
+    title?: string;
+    date?: string;
+    completed?: boolean;
+    parentId?: number;
+    order?: number;
+  }
+> = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { title, date, completed, parentId, order } = req.body;
   try {
@@ -76,8 +86,7 @@ export const updateTask = async (req: Request, res: Response) => {
   }
 };
 
-// Delete Task (and its subtasks)
-export const deleteTask = async (req: Request, res: Response) => {
+export const deleteTask: RequestHandler<{ id: string }> = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     await TaskRepository.deleteTaskWithSubtasks(Number(id));
@@ -88,21 +97,22 @@ export const deleteTask = async (req: Request, res: Response) => {
   }
 };
 
-// Toggle Task
-export const toggleTask = async (req: Request, res: Response) => {
+export const toggleTask: RequestHandler<{ id: string }> = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     const toggledTask = await TaskRepository.toggleTask(Number(id));
     res.json(toggledTask);
   } catch (error) {
     console.error('Error toggling task:', error);
-    // Handle specific error cases if needed
     res.status(500).json({ error: 'Failed to toggle task' });
   }
 };
 
-// Complete Task with Subtasks
-export const completeTaskWithSubtasks = async (req: Request, res: Response) => {
+export const completeTaskWithSubtasks: RequestHandler<
+  { id: string },
+  unknown,
+  { complete: boolean }
+> = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { complete } = req.body;
   try {
@@ -110,7 +120,6 @@ export const completeTaskWithSubtasks = async (req: Request, res: Response) => {
     res.json({ message: 'Task and subtasks updated successfully' });
   } catch (error) {
     console.error('Error completing task and subtasks:', error);
-    // Handle specific error cases if needed
     res.status(500).json({ error: 'Failed to update task and subtasks' });
   }
 };
