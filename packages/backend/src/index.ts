@@ -28,8 +28,8 @@ export function createApp() {
 // Only start server if not in test environment
 if (process.env.NODE_ENV !== 'test') {
   const app = createApp();
-  const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => {
+  const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 5000;
+  app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
   });
 }
