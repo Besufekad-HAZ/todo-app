@@ -4,18 +4,15 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "nodemon --watch src --exec ts-node src/index.ts",
-    "postinstall": "prisma generate",
-    "migrate": "prisma migrate deploy",
-    "build": "tsc",
-    "postbuild": "ls -la dist/",
-    "start": "npm run migrate && npx prisma db seed && node dist/index.js",
-    "test": "jest --forceExit --detectOpenHandles --coverage",
-    "test:watch": "jest --watch --forceExit --detectOpenHandles",
-    "seed": "ts-node prisma/seed.ts"
-  },
-  "prisma": {
-    "seed": "ts-node prisma/seed.ts"
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

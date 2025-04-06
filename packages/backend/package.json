@@ -9,10 +9,13 @@
     "migrate": "prisma migrate deploy",
     "build": "tsc",
     "postbuild": "ls -la dist/",
-    "start": "npm run migrate && node dist/index.js",
+    "start": "npm run migrate && npx prisma db seed && node dist/index.js",
     "test": "jest --forceExit --detectOpenHandles --coverage",
     "test:watch": "jest --watch --forceExit --detectOpenHandles",
     "seed": "ts-node packages/backend/prisma/seed.ts"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   },
   "keywords": [],
   "author": "",
