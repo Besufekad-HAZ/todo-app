@@ -74,7 +74,7 @@ A full-stack Todo application built with modern web technologies featuring neste
 
 ## 🚀 Live Demo <a name="live-demo"></a>
 
-[Live Demo Coming Soon](#)
+[Live Demo here](https://todo-app-frontend-sigma-nine.vercel.app/)
 
 ---
 
