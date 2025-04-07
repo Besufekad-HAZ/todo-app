@@ -10,7 +10,7 @@ datasource db {
 
 model Collection {
   id         Int      @id @default(autoincrement())
-  name       String
+  name       String   @unique
   isFavorite Boolean  @default(false)
   tasks      Task[]
   createdAt  DateTime @default(now())

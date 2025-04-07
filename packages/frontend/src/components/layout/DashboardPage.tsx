@@ -4,6 +4,7 @@ import { TaskList } from '../../features/tasks/TaskList';
 import { TaskForm } from '../../features/tasks/TaskForm';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { MobileSidebar } from '../../components/layout/MobileSidebar';
+import { useGetCollectionsQuery } from '../../services/api'; // <-- NEW
 
 interface DashboardPageProps {
   showTaskForm: boolean;
@@ -21,6 +22,10 @@ export function DashboardPage({
   const { collectionId } = useParams<{ collectionId?: string }>();
   const navigate = useNavigate();
   const selectedCollectionId = collectionId ? parseInt(collectionId) : null;
+
+  // NEW: Retrieve all collections and find the selected one
+  const { data: collections } = useGetCollectionsQuery();
+  const selectedCollection = collections?.find(c => c.id === selectedCollectionId);
 
   return (
     <div className="flex flex-1 overflow-hidden">
@@ -67,7 +72,9 @@ export function DashboardPage({
                     />
                   </svg>
                 </button>
-                <h2 className="text-xl font-semibold">School</h2>
+                <h2 className="text-xl font-semibold">
+                  {selectedCollection?.name || 'Collection'}
+                </h2>
                 <button className="ml-2" style={{ color: 'rgb(var(--color-text-muted))' }}>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
