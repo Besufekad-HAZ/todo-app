@@ -4,6 +4,7 @@ import { Header } from './components/layout/Header';
 import { Toaster } from './components/ui/Toaster';
 import { CollectionsPage } from './features/collections/CollectionsPage';
 import { DashboardPage } from './components/layout/DashboardPage';
+import { Analytics } from '@vercel/analytics/react';
 
 export function App() {
   const [showTaskForm, setShowTaskForm] = useState(false);
@@ -40,6 +41,7 @@ export function App() {
           />
         </Routes>
         <Toaster />
+        <Analytics />
       </div>
     </Router>
   );
