@@ -107,5 +107,12 @@ export const deleteCollection = async (id: number): Promise<Collection> => {
   if (protectedNames.includes(collection.name.toLowerCase())) {
     throw new Error('Cannot delete main collection');
   }
-  return prisma.collection.delete({ where: { id } });
+  // Delete all tasks associated with the collection first.
+  await prisma.task.deleteMany({
+    where: { collectionId: id },
+  });
+  // Now delete the collection.
+  return prisma.collection.delete({
+    where: { id },
+  });
 };
