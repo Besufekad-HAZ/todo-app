@@ -97,3 +97,22 @@ export const deleteTaskWithSubtasks = async (id: number): Promise<void> => {
     }),
   ]);
 };
+
+export const deleteCollection = async (id: number): Promise<Collection> => {
+  const collection = await prisma.collection.findUnique({ where: { id } });
+  if (!collection) {
+    throw new Error('Collection not found');
+  }
+  const protectedNames = ['school', 'personal', 'design', 'groceries'];
+  if (protectedNames.includes(collection.name.toLowerCase())) {
+    throw new Error('Cannot delete main collection');
+  }
+  // Delete all tasks associated with the collection first.
+  await prisma.task.deleteMany({
+    where: { collectionId: id },
+  });
+  // Now delete the collection.
+  return prisma.collection.delete({
+    where: { id },
+  });
+};

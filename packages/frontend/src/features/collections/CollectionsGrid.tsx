@@ -3,6 +3,8 @@ import {
   useGetCollectionsQuery,
   useToggleFavoriteMutation,
   useGetCollectionStatsQuery,
+  useCreateCollectionMutation, // <-- NEW hook
+  useDeleteCollectionMutation, // <-- NEW hook (ensure you've added this endpoint in your API slice)
 } from '../../services/api';
 import { Collection } from '../../types/types';
 import {
@@ -12,9 +14,9 @@ import {
   FaShoppingCart,
   FaPlus,
   FaStar,
-  FaRegBell,
+  FaTrash, // <-- NEW icon for delete
 } from 'react-icons/fa';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface CollectionsGridProps {
   onSelect: (id: number) => void;
@@ -24,10 +26,10 @@ interface CollectionCardProps {
   collection: Collection;
   onSelect: (id: number) => void;
   onToggleFavorite: (id: number) => void;
+  onDelete: (id: number) => void; // <-- NEW prop for deletion
 }
 
-function CollectionCard({ collection, onSelect, onToggleFavorite }: CollectionCardProps) {
-  // Add refetch function to stats query
+function CollectionCard({ collection, onSelect, onToggleFavorite, onDelete }: CollectionCardProps) {
   const {
     data: stats,
     isFetching,
@@ -37,17 +39,14 @@ function CollectionCard({ collection, onSelect, onToggleFavorite }: CollectionCa
     refetchOnMountOrArgChange: true,
   });
 
-  // Force immediate refetch when collection updates
   useEffect(() => {
     const timer = setTimeout(() => refetch(), 500);
     return () => clearTimeout(timer);
   }, [collection.taskCount, collection.completedCount, refetch]);
 
-  // Use only stats data when available to avoid inconsistencies
   const taskCount = stats?.taskCount ?? 0;
   const completedCount = stats?.completedCount ?? 0;
 
-  // Precise percentage calculation
   const completionPercentage = useMemo(() => {
     if (taskCount <= 0) return 0;
     const calculated = (completedCount / taskCount) * 100;
@@ -130,10 +129,7 @@ function CollectionCard({ collection, onSelect, onToggleFavorite }: CollectionCa
             transform="rotate(-90 20 20)"
           />
         </svg>
-        <span
-          className="absolute text-xs font-medium"
-          style={{ color: 'rgb(var(--color-text-base))' }}
-        >
+        <span className="absolute text-xs font-medium" style={{ color: 'rgb(var(--color-text-base))' }}>
           {isFetching ? '...' : `${percentage.toFixed(0)}%`}
         </span>
       </div>
@@ -146,6 +142,10 @@ function CollectionCard({ collection, onSelect, onToggleFavorite }: CollectionCa
     return `${completedCount}/${taskCount} done`;
   };
 
+  // Determine if the collection is deletable (only allow deleting non-protected ones)
+  const protectedCollections = ['school', 'personal', 'design', 'groceries'];
+  const isDeletable = !protectedCollections.includes(normalizedCollectionName);
+
   return (
     <div
       onClick={() => onSelect(collection.id)}
@@ -154,7 +154,6 @@ function CollectionCard({ collection, onSelect, onToggleFavorite }: CollectionCa
         backgroundColor: 'rgb(var(--color-card-bg))',
         borderColor: 'rgb(var(--color-card-border))',
       }}
-      // Adding hover styles with additional transformations for a nice effect
       onMouseEnter={(e) => {
         e.currentTarget.style.backgroundColor = 'rgb(var(--color-card-hover))';
         e.currentTarget.style.transform = 'translateY(-2px)';
@@ -169,29 +168,34 @@ function CollectionCard({ collection, onSelect, onToggleFavorite }: CollectionCa
       }}
     >
       <div className="flex justify-between items-start">
-        <div
-          className={`w-10 h-10 rounded-lg ${getIconBgColor()} flex items-center justify-center`}
-        >
+        <div className={`w-10 h-10 rounded-lg ${getIconBgColor()} flex items-center justify-center`}>
           {getIcon()}
         </div>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggleFavorite(collection.id);
-          }}
-          className="text-gray-400 hover:text-yellow-400 transition-colors duration-200"
-        >
-          <FaStar
-            className={`h-5 w-5 ${collection.isFavorite ? 'text-yellow-400 fill-current' : ''}`}
-          />
-        </button>
+        <div className="flex space-x-2">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleFavorite(collection.id);
+            }}
+            className="text-gray-400 hover:text-yellow-400 transition-colors duration-200"
+          >
+            <FaStar className={`h-5 w-5 ${collection.isFavorite ? 'text-yellow-400 fill-current' : ''}`} />
+          </button>
+          {isDeletable && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(collection.id);
+              }}
+              className="text-red-500 hover:text-red-600 transition-colors duration-200"
+            >
+              <FaTrash className="h-5 w-5" />
+            </button>
+          )}
+        </div>
       </div>
       <div className="mt-4 flex-grow flex flex-col justify-center items-center">
-        {/* Changed to respect the current theme for text color */}
-        <h3
-          className="font-medium text-xl sm:text-2xl mb-3"
-          style={{ color: 'rgb(var(--color-text-base))' }}
-        >
+        <h3 className="font-medium text-xl sm:text-2xl mb-3" style={{ color: 'rgb(var(--color-text-base))' }}>
           {collection.name.charAt(0).toUpperCase() + collection.name.slice(1)}
         </h3>
         <CircularProgress percentage={completionPercentage} color={getProgressColor()} />
@@ -206,8 +210,11 @@ function CollectionCard({ collection, onSelect, onToggleFavorite }: CollectionCa
 export function CollectionsGrid({ onSelect }: CollectionsGridProps) {
   const { data: collections, isLoading } = useGetCollectionsQuery();
   const [toggleFavorite] = useToggleFavoriteMutation();
+  const [createCollection] = useCreateCollectionMutation();
+  const [deleteCollection] = useDeleteCollectionMutation(); // <-- NEW hook for deletion
   const [activeTab, setActiveTab] = useState<'favorites' | 'all'>('all');
-  const [showComingSoon, setShowComingSoon] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+  const [newCollectionName, setNewCollectionName] = useState('');
 
   if (isLoading)
     return (
@@ -220,38 +227,35 @@ export function CollectionsGrid({ onSelect }: CollectionsGridProps) {
   const displayedCollections =
     activeTab === 'favorites' ? collections?.filter((c) => c.isFavorite) : collections;
 
+  const handleSaveNewCollection = async () => {
+    if (!newCollectionName.trim()) return;
+    try {
+      await createCollection(newCollectionName).unwrap();
+      setIsAdding(false);
+      setNewCollectionName('');
+    } catch (err) {
+      console.error('Failed to create collection:', err);
+    }
+  };
+
+  const handleDeleteCollection = async (id: number) => {
+    try {
+      await deleteCollection(id).unwrap();
+    } catch (err) {
+      console.error('Failed to delete collection:', err);
+    }
+  };
+
   return (
     <div className="w-full relative">
-      {/* Coming Soon Notification */}
-      <AnimatePresence>
-        {showComingSoon && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ type: 'spring', damping: 25 }}
-            className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50"
-          >
-            <div className="flex items-center bg-primary text-white px-4 py-3 rounded-lg shadow-xl">
-              <FaRegBell className="mr-2 animate-pulse" />
-              <span>Coming soon! We're working on this feature.</span>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
       <div className="flex justify-between items-center mb-6">
-        <h1
-          className="text-2xl sm:text-3xl font-bold"
-          style={{ color: 'rgb(var(--color-text-base))' }}
-        >
+        <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: 'rgb(var(--color-text-base))' }}>
           Collections
         </h1>
         <div className="flex space-x-2">
           <button
             className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ease-in-out ${
-              activeTab === 'favorites'
-                ? 'bg-primary text-white'
-                : 'bg-card-bg text-text-base hover:bg-card-hover'
+              activeTab === 'favorites' ? 'bg-primary text-white' : 'bg-card-bg text-text-base hover:bg-card-hover'
             }`}
             onClick={() => setActiveTab('favorites')}
           >
@@ -259,9 +263,7 @@ export function CollectionsGrid({ onSelect }: CollectionsGridProps) {
           </button>
           <button
             className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ease-in-out ${
-              activeTab === 'all'
-                ? 'bg-primary text-white'
-                : 'bg-card-bg text-text-base hover:bg-card-hover'
+              activeTab === 'all' ? 'bg-primary text-white' : 'bg-card-bg text-text-base hover:bg-card-hover'
             }`}
             onClick={() => setActiveTab('all')}
           >
@@ -277,35 +279,67 @@ export function CollectionsGrid({ onSelect }: CollectionsGridProps) {
             collection={collection}
             onSelect={onSelect}
             onToggleFavorite={toggleFavorite}
+            onDelete={handleDeleteCollection}
           />
         ))}
-        {/* Updated Add Collection Card */}
-        <div
-          className="rounded-lg p-4 flex items-center justify-center border cursor-pointer transition-all duration-200 h-52 shadow-sm transform hover-card-effect"
-          style={{
-            backgroundColor: 'rgb(var(--color-card-bg))',
-            borderColor: 'rgb(var(--color-card-border))',
-          }}
-          onClick={() => {
-            setShowComingSoon(true);
-            setTimeout(() => setShowComingSoon(false), 3000);
-          }}
-        >
-          <motion.div
-            className="flex flex-col items-center"
-            style={{ color: 'rgb(var(--color-text-muted))' }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+        {isAdding ? (
+          <div
+            className="rounded-lg p-4 flex flex-col justify-center border shadow-sm transform h-52"
+            style={{
+              backgroundColor: 'rgb(var(--color-card-bg))',
+              borderColor: 'rgb(var(--color-card-border))',
+            }}
+          >
+            <input
+              type="text"
+              value={newCollectionName}
+              onChange={(e) => setNewCollectionName(e.target.value)}
+              placeholder="Collection Name"
+              className="mb-4 px-3 py-2 border rounded focus:outline-none"
+            />
+            <div className="flex justify-around">
+              <button
+                onClick={handleSaveNewCollection}
+                className="px-4 py-1 rounded-md bg-primary text-white hover:bg-primary-hover transition-colors"
+              >
+                Save
+              </button>
+              <button
+                onClick={() => {
+                  setIsAdding(false);
+                  setNewCollectionName('');
+                }}
+                className="px-4 py-1 rounded-md bg-gray-300 text-gray-700 hover:bg-gray-400 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div
+            className="rounded-lg p-4 flex items-center justify-center border cursor-pointer transition-all duration-200 h-52 shadow-sm transform hover-card-effect"
+            style={{
+              backgroundColor: 'rgb(var(--color-card-bg))',
+              borderColor: 'rgb(var(--color-card-border))',
+            }}
+            onClick={() => setIsAdding(true)}
           >
             <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ repeat: Infinity, duration: 4, ease: 'linear' }}
+              className="flex flex-col items-center"
+              style={{ color: 'rgb(var(--color-text-muted))' }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
-              <FaPlus className="h-8 w-8" />
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ repeat: Infinity, duration: 4, ease: 'linear' }}
+              >
+                <FaPlus className="h-8 w-8" />
+              </motion.div>
+              <span className="mt-2 text-sm font-medium">Add Collection</span>
             </motion.div>
-            <span className="mt-2 text-sm font-medium">Add Collection</span>
-          </motion.div>
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
