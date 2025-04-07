@@ -15,9 +15,8 @@ import {
   FaPlus,
   FaStar,
   FaTrash, // <-- NEW icon for delete
-  FaRegBell,
 } from 'react-icons/fa';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface CollectionsGridProps {
   onSelect: (id: number) => void;
