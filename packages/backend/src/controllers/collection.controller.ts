@@ -66,3 +66,18 @@ export const updateCollectionStats = async (req: Request<{ id: string }>, res: R
     res.status(500).json({ error: 'Failed to update collection stats' });
   }
 };
+
+export const deleteCollection = async (req: Request<{ id: string }>, res: Response) => {
+  const { id } = req.params;
+  try {
+    const deleted = await CollectionRepository.deleteCollection(Number(id));
+    res.json(deleted);
+  } catch (error) {
+    console.error(error);
+    if (error.message === 'Cannot delete main collection') {
+      res.status(403).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: 'Failed to delete collection' });
+    }
+  }
+};

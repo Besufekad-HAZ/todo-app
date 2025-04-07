@@ -6,6 +6,7 @@ const router = express.Router();
 router.get('/', CollectionController.getCollections);
 router.post('/', CollectionController.createCollection);
 router.patch('/:id/favorite', CollectionController.toggleFavorite);
+router.delete('/:id', CollectionController.deleteCollection); // <-- New route
 router.get('/:id/stats', CollectionController.getCollectionStats);
 router.put('/:id/stats', CollectionController.updateCollectionStats);
 

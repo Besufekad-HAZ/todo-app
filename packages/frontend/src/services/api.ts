@@ -18,6 +18,14 @@ export const api = createApi({
       }),
       invalidatesTags: ['Collection'],
     }),
+    createCollection: builder.mutation<Collection, string>({
+      query: (name) => ({
+        url: 'collections',
+        method: 'POST',
+        body: { name },
+      }),
+      invalidatesTags: ['Collection'],
+    }),
 
     // Tasks
     getTasksByCollection: builder.query<Task[], number>({
@@ -70,7 +78,6 @@ export const api = createApi({
     }),
 
     // New endpoint: complete task + subtasks
-    // In api.ts
     completeTaskWithSubtasks: builder.mutation<Task, { id: number; complete: boolean }>({
       query: ({ id, complete }) => ({
         url: `tasks/${id}/complete-with-subtasks`,
@@ -98,12 +105,20 @@ export const api = createApi({
       }),
       invalidatesTags: (_result, _error, arg) => [{ type: 'Collection', id: arg }],
     }),
+    deleteCollection: builder.mutation<Collection, number>({
+      query: (id) => ({
+        url: `collections/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Collection'],
+    }),
   }),
 });
 
 export const {
   useGetCollectionsQuery,
   useToggleFavoriteMutation,
+  useCreateCollectionMutation,
   useGetTasksByCollectionQuery,
   useCreateTaskMutation,
   useCompleteTaskMutation,
@@ -112,4 +127,5 @@ export const {
   useCompleteTaskWithSubtasksMutation,
   useGetCollectionStatsQuery,
   useUpdateCollectionStatsMutation,
+  useDeleteCollectionMutation,
 } = api;
